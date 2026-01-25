@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useActiveUsers } from '@/hooks/useUsers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
@@ -97,34 +98,40 @@ const StatCard: FC<StatCardProps> = ({ title, value, description, icon }) => (
   </Card>
 );
 
-const AdminDashboard: FC = () => (
-  <div className="grid gap-4 lg:grid-cols-2">
-    <Card>
-      <CardHeader>
-        <CardTitle>System Overview</CardTitle>
-        <CardDescription>Key metrics across all projects</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Active Users</span>
-            <Badge variant="success">12 Online</Badge>
+const AdminDashboard: FC = () => {
+  const { data: activeUsers, isLoading: usersLoading } = useActiveUsers();
+  const activeUserCount = activeUsers?.length ?? 0;
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle>System Overview</CardTitle>
+          <CardDescription>Key metrics across all projects</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Active Users</span>
+              <Badge variant="success">
+                {usersLoading ? '...' : `${activeUserCount} Active`}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Total Budget</span>
+              <span className="font-medium">$125,000</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Pending Tasks</span>
+              <span className="font-medium">47</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Overdue Items</span>
+              <Badge variant="destructive">3</Badge>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Total Budget</span>
-            <span className="font-medium">$125,000</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Pending Tasks</span>
-            <span className="font-medium">47</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Overdue Items</span>
-            <Badge variant="destructive">3</Badge>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
 
     <Card>
       <CardHeader>
@@ -141,7 +148,8 @@ const AdminDashboard: FC = () => (
       </CardContent>
     </Card>
   </div>
-);
+  );
+};
 
 const FinanceDashboard: FC = () => (
   <div className="grid gap-4 lg:grid-cols-2">
