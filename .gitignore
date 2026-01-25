@@ -24,5 +24,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment files (local configs)
+# Environment files (local configs) - NEVER commit
 /.env.*
+.env
+.env.local
+.env.production
+.env.development
+
+# Sensitive credentials
+firebase_config.js
+google-services.json
+*-firebase-adminsdk-*.json
+serviceAccountKey.json
+web.json.save
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,61 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isValidFile() {
+      return request.resource.size < 50 * 1024 * 1024; // 50MB max
+    }
+    
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isPDF() {
+      return request.resource.contentType == 'application/pdf';
+    }
+    
+    // Receipts - users can upload their own
+    match /receipts/{userId}/{expenseId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && isValidFile() && (isImage() || isPDF());
+    }
+    
+    // Documents - project-scoped and company-wide
+    match /documents/{category}/{documentId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidFile();
+    }
+    
+    // Project attachments
+    match /projects/{projectId}/attachments/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidFile();
+    }
+    
+    // Asset images and QR codes
+    match /assets/{assetId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidFile();
+    }
+    
+    // Announcement images
+    match /announcements/{announcementId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidFile() && isImage();
+    }
+    
+    // User avatars
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(userId) && isImage() && request.resource.size < 5 * 1024 * 1024;
+    }
+  }
+}

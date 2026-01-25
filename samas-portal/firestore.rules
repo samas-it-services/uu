@@ -1,0 +1,190 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========== Helper Functions ==========
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function userDocExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && userDocExists() && getUserData().roles.hasAny(['super_admin']);
+    }
+
+    function isFinanceManager() {
+      return isAuthenticated() && userDocExists() && getUserData().roles.hasAny(['finance_manager', 'super_admin']);
+    }
+
+    function isProjectManager() {
+      return isAuthenticated() && userDocExists() && getUserData().roles.hasAny(['project_manager', 'super_admin']);
+    }
+
+    function canAccessProject(projectId) {
+      return isAuthenticated() && userDocExists() && (
+             isSuperAdmin() ||
+             getUserData().roles.hasAny(['finance_manager']) ||
+             getUserData().managedProjects.hasAny([projectId]) ||
+             getUserData().memberProjects.hasAny([projectId]));
+    }
+
+    function isProjectMember(projectId) {
+      return isAuthenticated() && userDocExists() && (
+             getUserData().managedProjects.hasAny([projectId]) ||
+             getUserData().memberProjects.hasAny([projectId]));
+    }
+
+    function isProjectOwner(projectId) {
+      return isSuperAdmin() || (isAuthenticated() && userDocExists() && getUserData().managedProjects.hasAny([projectId]));
+    }
+
+    // ========== Users Collection ==========
+    match /users/{userId} {
+      // Allow authenticated users to read any user (for display purposes)
+      // Allow users to read their own document even if it doesn't exist yet
+      allow read: if isAuthenticated();
+      // Allow users to create their own document on first sign-in
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isSuperAdmin() ||
+                       (request.auth.uid == userId &&
+                        !request.resource.data.diff(resource.data).affectedKeys()
+                          .hasAny(['roles', 'managedProjects', 'memberProjects']));
+      allow delete: if isSuperAdmin();
+    }
+    
+    // ========== Roles Collection ==========
+    match /roles/{roleId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+    
+    // ========== Projects Collection ==========
+    match /projects/{projectId} {
+      allow read: if canAccessProject(projectId);
+      allow create: if isProjectManager();
+      allow update: if isProjectOwner(projectId);
+      allow delete: if isSuperAdmin();
+      
+      // SENSITIVE DATA - RESTRICTED (Project managers CANNOT access)
+      match /sensitiveData/{docId} {
+        allow read: if isSuperAdmin() || isFinanceManager();
+        allow write: if isSuperAdmin() || isFinanceManager();
+      }
+      
+      // Project assets subcollection
+      match /assets/{assetId} {
+        allow read: if canAccessProject(projectId);
+        allow write: if isProjectOwner(projectId);
+      }
+      
+      // Project activities subcollection
+      match /activities/{activityId} {
+        allow read: if canAccessProject(projectId);
+        allow create: if isProjectMember(projectId);
+        allow update, delete: if false;
+      }
+    }
+    
+    // ========== Tasks Collection ==========
+    match /tasks/{taskId} {
+      allow read: if isAuthenticated() && 
+                    (isSuperAdmin() || canAccessProject(resource.data.projectId));
+      allow create: if isAuthenticated() && 
+                       canAccessProject(request.resource.data.projectId) &&
+                       isProjectOwner(request.resource.data.projectId);
+      allow update: if isAuthenticated() && 
+                       canAccessProject(resource.data.projectId) &&
+                       (isProjectOwner(resource.data.projectId) ||
+                        resource.data.assignedTo.hasAny([request.auth.uid]));
+      allow delete: if isProjectOwner(resource.data.projectId);
+      
+      match /comments/{commentId} {
+        allow read: if canAccessProject(get(/databases/$(database)/documents/tasks/$(taskId)).data.projectId);
+        allow create: if canAccessProject(get(/databases/$(database)/documents/tasks/$(taskId)).data.projectId);
+        allow update: if request.auth.uid == resource.data.userId;
+        allow delete: if isSuperAdmin() || request.auth.uid == resource.data.userId;
+      }
+    }
+    
+    // ========== Expenses Collection ==========
+    match /expenses/{expenseId} {
+      allow read: if isAuthenticated() && 
+                    (isFinanceManager() || 
+                     resource.data.userId == request.auth.uid ||
+                     (resource.data.projectId != null && isProjectOwner(resource.data.projectId)));
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && 
+                       (isFinanceManager() ||
+                        (resource.data.userId == request.auth.uid && 
+                         resource.data.status in ['draft', 'needs_info']));
+      allow delete: if isFinanceManager();
+    }
+    
+    // ========== Documents Collection ==========
+    match /documents/{documentId} {
+      allow read: if isAuthenticated() && 
+                    (isSuperAdmin() ||
+                     resource.data.accessLevel == 'company' ||
+                     (resource.data.projectId != null && canAccessProject(resource.data.projectId)) ||
+                     resource.data.accessList.hasAny([request.auth.uid])) &&
+                    (!resource.data.isSensitive || isSuperAdmin() || isFinanceManager());
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && 
+                       (isSuperAdmin() ||
+                        resource.data.uploadedBy == request.auth.uid ||
+                        (resource.data.projectId != null && isProjectOwner(resource.data.projectId)));
+      allow delete: if isSuperAdmin() || resource.data.uploadedBy == request.auth.uid;
+    }
+    
+    // ========== Assets Collection ==========
+    match /assets/{assetId} {
+      allow read: if isAuthenticated() &&
+                    (isSuperAdmin() || isFinanceManager() ||
+                     (resource.data.assignedToProject != null && 
+                      canAccessProject(resource.data.assignedToProject)) ||
+                     resource.data.assignedTo == request.auth.uid);
+      allow create: if isSuperAdmin();
+      allow update: if isSuperAdmin() || 
+                       (isProjectManager() && 
+                        resource.data.assignedToProject != null &&
+                        isProjectOwner(resource.data.assignedToProject));
+      allow delete: if isSuperAdmin();
+    }
+    
+    // ========== Announcements Collection ==========
+    match /announcements/{announcementId} {
+      allow read: if isAuthenticated() && 
+                    (resource.data.targetType == 'all' ||
+                     resource.data.targetRoles.hasAny(getUserData().roles) ||
+                     resource.data.targetUsers.hasAny([request.auth.uid]) ||
+                     resource.data.targetProjects.hasAny(getUserData().managedProjects) ||
+                     resource.data.targetProjects.hasAny(getUserData().memberProjects));
+      allow create: if isSuperAdmin() || isProjectManager();
+      allow update: if isSuperAdmin() || 
+                       resource.data.createdBy == request.auth.uid ||
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy', 'readCount']);
+      allow delete: if isSuperAdmin();
+    }
+    
+    // ========== Presence Collection ==========
+    match /presence/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ========== Audit Logs Collection ==========
+    match /auditLogs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+  }
+}
