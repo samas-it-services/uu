@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
+import { Module } from '@/types/role';
 
 interface NavItem {
   name: string;
@@ -125,7 +126,7 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const canAccessItem = (item: NavItem): boolean => {
     if (!item.module) return true;
-    return hasPermission(item.module as any, 'read');
+    return hasPermission(item.module as Module, 'read');
   };
 
   const filteredNavItems = navItems.filter(canAccessItem);

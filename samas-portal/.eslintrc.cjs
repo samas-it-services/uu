@@ -10,7 +10,10 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh'],
   rules: {
-    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    'react-refresh/only-export-components': [
+      'warn',
+      { allowConstantExport: true, allowExportNames: ['AuthContext', 'ThemeContext', 'ToastContext'] },
+    ],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },
 };

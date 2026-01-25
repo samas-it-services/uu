@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/contexts/ToastContext';
+import { useToast } from '@/hooks/useToast';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
@@ -27,8 +27,9 @@ export const LoginPage: FC = () => {
     setIsSigningIn(true);
     try {
       await signInWithGoogle();
-    } catch (err: any) {
-      showError('Sign in failed', err.message || 'Please try again');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Please try again';
+      showError('Sign in failed', message);
     } finally {
       setIsSigningIn(false);
     }

@@ -3,7 +3,6 @@ import {
   FC,
   ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -23,7 +22,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { auth, db, googleProvider } from '@/services/firebase/config';
-import { User, GoogleTokens } from '@/types/user';
+import { User } from '@/types/user';
 import { Role } from '@/types/role';
 
 const SUPER_ADMINS = ['bill@samas.tech', 'bilgrami@gmail.com'];
@@ -41,7 +40,7 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -80,25 +79,25 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           userRoles = ['employee'];
         }
 
-        const newUser: Omit<User, 'id'> = {
+        const newUser = {
           email,
           displayName: fbUser.displayName || '',
           photoURL: fbUser.photoURL || '',
           roles: userRoles,
-          managedProjects: [],
-          memberProjects: [],
+          managedProjects: [] as string[],
+          memberProjects: [] as string[],
           isActive: true,
-          status: 'online',
+          status: 'online' as const,
           statusMessage: '',
-          lastSeen: serverTimestamp() as any,
+          lastSeen: serverTimestamp(),
           preferences: {
-            theme: 'system',
+            theme: 'system' as const,
             notifications: { email: true, push: true, desktop: true },
-            emailDigest: 'daily',
+            emailDigest: 'daily' as const,
           },
-          createdAt: serverTimestamp() as any,
-          updatedAt: serverTimestamp() as any,
-          lastLogin: serverTimestamp() as any,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
         };
 
         await setDoc(userRef, newUser);
@@ -151,10 +150,10 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
       if (credential && result.user.email) {
         // Store OAuth tokens for future Google API calls
-        const tokens: GoogleTokens = {
+        const tokens = {
           accessToken: credential.accessToken || '',
           refreshToken: '', // Only available with offline access
-          expiresAt: serverTimestamp() as any,
+          expiresAt: serverTimestamp(),
         };
 
         const userRef = doc(db, 'users', result.user.uid);
@@ -196,10 +195,3 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
-  }
-  return context;
-};

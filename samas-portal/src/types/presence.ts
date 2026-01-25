@@ -31,7 +31,7 @@ export interface ActivityLog {
   resourceId: string;
   resourceName: string;
   projectId: string | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean | null>;
   timestamp: Timestamp;
 }
 

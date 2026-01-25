@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, FC, ReactNode, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -8,7 +8,7 @@ interface ThemeContextValue {
   resolvedTheme: 'light' | 'dark';
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null);
+export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const STORAGE_KEY = 'samas-theme';
 
@@ -73,10 +73,3 @@ export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-};

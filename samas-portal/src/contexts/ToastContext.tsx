@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useCallback, useContext, useState } from 'react';
+import { createContext, FC, ReactNode, useCallback, useState } from 'react';
 import { Toaster } from '@/components/ui/Toaster';
 import { ToastProps } from '@/components/ui/Toast';
 
@@ -11,7 +11,7 @@ interface ToastContextValue {
   error: (title: string, description?: string) => void;
 }
 
-const ToastContext = createContext<ToastContextValue | null>(null);
+export const ToastContext = createContext<ToastContextValue | null>(null);
 
 export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Omit<ToastProps, 'onClose'>[]>([]);
@@ -49,10 +49,3 @@ export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
-};
