@@ -9,6 +9,7 @@
 |---------|------|--------|---------|
 | 1.0 | 2025-01-24 | System | Initial TDD |
 | 1.1 | 2025-01-24 | System | Added Google APIs, Kanban, Presence |
+| 1.2 | 2025-01-25 | System | Added Custom Fields System, Extended Task Interface |
 
 ---
 
@@ -383,49 +384,147 @@ interface Label {
 }
 ```
 
+#### customFieldDefinitions (v1.2)
+```typescript
+/**
+ * Custom Field Definitions - Enterprise metadata system
+ * Allows administrators to define custom fields for tasks.
+ * Inspired by Jira, Asana, and ServiceNow custom field systems.
+ */
+
+// Supported field types
+type CustomFieldType =
+  | 'text'        // Free text input
+  | 'number'      // Numeric values with precision
+  | 'enum'        // Single-select dropdown
+  | 'multi_enum'  // Multi-select tags
+  | 'date'        // Date/datetime picker
+  | 'person'      // User reference (picker)
+  | 'checkbox'    // Boolean toggle
+  | 'url';        // URL with validation
+
+// Field value can be multiple types based on field definition
+type CustomFieldValue =
+  | string                                    // text, enum, url
+  | number                                    // number
+  | boolean                                   // checkbox
+  | string[]                                  // multi_enum
+  | { date: string; time?: string }           // date/datetime
+  | { userId: string; displayName: string };  // person reference
+
+interface CustomFieldDefinition {
+  id: string;
+  name: string;                          // Display name (e.g., "Task Type")
+  key: string;                           // Machine key (e.g., "taskType")
+  description?: string;                  // Help text for users
+  type: CustomFieldType;
+
+  // For enum/multi_enum types
+  options?: CustomFieldOption[];
+
+  // Validation
+  required: boolean;
+  defaultValue?: CustomFieldValue;
+
+  // Scope
+  projectId?: string | null;             // null = global, string = project-scoped
+
+  // Display
+  order: number;                         // Sort order in forms
+  section?: string;                      // Group fields into sections
+  placeholder?: string;
+
+  // State
+  enabled: boolean;
+
+  // Audit
+  createdBy: string;
+  createdAt: Timestamp;
+  updatedBy?: string;
+  updatedAt: Timestamp;
+}
+
+interface CustomFieldOption {
+  value: string;
+  label: string;
+  color?: string;                        // For visual indicators
+  order: number;
+}
+```
+
 #### tasks
 ```typescript
+// Controlled vocabularies for task categorization
+type TaskType = 'growth' | 'experimentation' | 'operational' | 'maintenance' | 'bug' | 'feature';
+type TaskCategory = 'seo' | 'marketing' | 'engineering' | 'design' | 'content' | 'analytics' | 'other';
+
 interface Task {
   id: string;
   projectId: string;                   // Required - tasks are project-scoped
-  
+
   // Content
   title: string;
   description: string;
-  
+
   // Status (Kanban)
   status: string;                      // Matches project.settings.taskStatuses
   statusOrder: number;                 // Order within column
-  
+
   // Assignment
   assignedTo: string[];                // Can have multiple assignees
   assignedBy: string;
-  
+
   // Priority & Labels
   priority: 'low' | 'medium' | 'high' | 'critical';
   labels: string[];                    // Label IDs
-  
+
   // Timeline
   dueDate?: Timestamp;
   startDate?: Timestamp;
   completedAt?: Timestamp;
-  
+
+  // === NEW: Lifecycle (v1.2) ===
+  completionDate?: Timestamp | null;   // User-defined completion date (from imports)
+  actualCompletionDate?: Timestamp;    // System-recorded actual completion
+
+  // === NEW: Categorization (v1.2) ===
+  taskType?: TaskType;                 // growth, experimentation, operational, etc.
+  category?: TaskCategory;             // seo, marketing, engineering, etc.
+  phase?: string;                      // Project phase (e.g., "Search & Discovery")
+  sprint?: string;                     // Sprint/week identifier (e.g., "Week 1")
+
+  // === NEW: Goals & Criteria (v1.2) ===
+  goal?: string;                       // What this task aims to achieve
+  acceptanceCriteria?: string;         // How to know task is complete
+  successMetrics?: string;             // How to measure performance
+
+  // === NEW: Additional Context (v1.2) ===
+  notes?: string;                      // General notes
+
+  // === NEW: External Integration (v1.2) ===
+  externalId?: string;                 // Task # from external system (CSV, Jira)
+  externalUrl?: string;                // Link to external ticket
+  sourceSystem?: string;               // "csv_import", "jira", "asana", etc.
+
+  // === NEW: Custom Fields (v1.2) ===
+  customFields?: Record<string, CustomFieldValue>;  // Dynamic custom fields
+
   // Checklist
   checklist: ChecklistItem[];
-  
+
   // Attachments
   attachments: Attachment[];
-  
+
   // Dependencies
   dependencies: string[];              // Task IDs that must complete first
-  
+
   // Time tracking
   estimatedHours?: number;
   actualHours?: number;
-  
+
   // Comments stored in subcollection
   commentCount: number;
-  
+
   createdBy: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;

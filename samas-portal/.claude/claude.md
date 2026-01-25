@@ -98,8 +98,9 @@ Examples:
 Always read these files before implementing features:
 - `docs/PRD.md` - Product requirements
 - `docs/TDD.md` - Technical design
+- `docs/architecture.md` - System architecture
 - `docs/implementation-checklist.md` - Progress tracking
-- `docs/agents/*.md` - Agent-specific checklists (12 files)
+- `docs/agents/*.md` - Agent-specific checklists (13 files)
 
 ## Agent Files (docs/agents/)
 
@@ -113,6 +114,7 @@ Each phase has specific agent files to reference:
 | 4 (Projects) | 06-projects-tasks-agent.md |
 | 5 (Assets) | 07-assets-agent.md, 08-announcements-agent.md |
 | 6 (Testing) | 10-testing-agent.md, 11-pwa-presence-agent.md |
+| 7 (Custom Fields) | 13-custom-fields-agent.md |
 
 ## Testing Workflow
 

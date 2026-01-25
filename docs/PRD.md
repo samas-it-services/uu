@@ -875,6 +875,56 @@ After meeting:
 
 ---
 
+## 10.5 Custom Fields System (Enterprise Feature)
+
+### 10.5.1 Overview
+A flexible metadata system allowing administrators to define custom fields for tasks and other entities, inspired by enterprise tools like Jira, Asana, and ServiceNow.
+
+### 10.5.2 Custom Field Types
+| Type | Description | Example |
+|------|-------------|---------|
+| **text** | Free text input | Goal, Notes |
+| **number** | Numeric values with precision | Estimated Hours |
+| **enum** | Single-select dropdown | Task Type, Priority |
+| **multi_enum** | Multi-select tags | Labels, Categories |
+| **date** | Date/datetime picker | Due Date, Completion Date |
+| **person** | User reference | Assignee, Reviewer |
+| **checkbox** | Boolean toggle | Is Blocked, Requires Approval |
+| **url** | URL with validation | External Link |
+
+### 10.5.3 Field Scopes
+- **Global**: Available across all projects, managed by admin
+- **Project-scoped**: Available only in specific project, managed by project manager
+
+### 10.5.4 Core Task Extensions
+Built-in fields added to Task entity:
+- `taskType`: growth | experimentation | operational | maintenance | bug | feature
+- `category`: seo | marketing | engineering | design | content | analytics | other
+- `phase`: Project phase identifier
+- `sprint`: Sprint/week identifier
+- `goal`: Task goal description
+- `acceptanceCriteria`: Completion criteria
+- `successMetrics`: How to measure success
+- `notes`: Additional context
+- `completionDate`: When task was completed
+- `externalId`: Reference to external system (CSV import, Jira, etc.)
+
+### 10.5.5 Admin UI
+- Create/edit/delete custom field definitions
+- Set required vs optional fields
+- Define default values
+- Configure dropdown options for enum types
+- Reorder fields
+- Enable/disable fields without deletion
+
+### 10.5.6 Data Import
+Support for importing tasks from external sources:
+- CSV import with field mapping
+- Automatic creation of custom fields for unmapped columns
+- Source system tracking for audit
+
+---
+
 ## 11. Out of Scope
 
 ### 11.1 Version 1.0 Exclusions
@@ -918,3 +968,4 @@ After meeting:
 |------|---------|---------|
 | 2025-01-24 | 1.0 | Initial document |
 | 2025-01-24 | 1.1 | Added Google integrations, Kanban, presence features |
+| 2025-01-25 | 1.2 | Added Custom Fields System (Section 10.5), task extensions |

@@ -5,6 +5,19 @@ All notable changes to the SaMas Portal project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Documentation
+- Updated `docs/implementation-checklist.md` to reflect completed Phases 2-4 status
+- Updated `docs/PRD.md` with Custom Fields System specification (Section 10.5)
+- Updated `docs/TDD.md` with CustomFieldDefinition interface and extended Task type
+- Created `docs/architecture.md` with system architecture diagrams
+- Updated `docs/agents/06-projects-tasks-agent.md` with completed items and Phase 7 tasks
+- Created `docs/agents/13-custom-fields-agent.md` for Custom Fields Agent
+- Updated `samas-portal/.claude/CLAUDE.md` with Phase 7 agent reference
+
+---
+
 ## [0.1.0] - 2025-01-25
 
 ### Added - Phase 1: Foundation & Firebase Setup
@@ -214,6 +227,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rich text announcements
 - Targeting and read receipts
 - *(Types defined, implementation pending)*
+
+### [0.6.0] - Phase 7: Custom Fields System
+- Enterprise-grade custom fields for tasks
+- Dynamic field definitions (admin-configurable)
+- Field types: text, number, enum, multi_enum, date, person, checkbox, url
+- Project-scoped vs global fields
+- Extended Task properties (taskType, category, phase, sprint, goal, acceptanceCriteria, etc.)
+- Admin UI for field management
 
 ### [1.0.0] - Phase 6: PWA, Presence, Testing & Deployment
 - Online presence system

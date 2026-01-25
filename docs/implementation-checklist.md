@@ -17,11 +17,11 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 | Phase | Status | Progress | Assignee |
 |-------|--------|----------|----------|
 | Phase 1: Foundation | ✅ Complete | 100% | Architecture + Auth Agents |
-| Phase 2: RBAC | 🟡 In Progress | 20% | RBAC Admin Agent |
-| Phase 3: Finance & Docs | 🔴 Not Started | 0% | Finance + Documents Agents |
-| Phase 4: Projects & Tasks | 🔴 Not Started | 0% | Projects & Tasks Agent |
+| Phase 2: RBAC | ✅ Complete | 100% | RBAC Admin Agent |
+| Phase 3: Finance & Docs | ✅ Complete | 100% | Finance + Documents Agents |
+| Phase 4: Projects & Tasks | ✅ Complete | 100% | Projects & Tasks Agent |
 | Phase 5: Assets & News | 🔴 Not Started | 0% | Assets + Announcements Agents |
-| Phase 6: PWA & Deploy | 🟡 Partial | 30% | PWA + Testing + Docs Agents |
+| Phase 6: PWA & Deploy | 🟡 In Progress | 70% | PWA + Testing + Docs Agents |
 
 ---
 
@@ -101,63 +101,63 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 **Duration**: 3-4 days | **Priority**: Critical
 
 ### 2.1 Permission System Core
-- [ ] Create Permission type definitions
-- [ ] Create Role type definitions with dataAccess field
-- [ ] Implement usePermissions hook
-- [ ] Create hasPermission function
-- [ ] Create canAccessProject function
-- [ ] Create canAccessSensitiveData function
-- [ ] Create isSuperAdmin/isFinanceManager/isProjectManager helpers
-- [ ] Create PermissionGuard component
-- [ ] Create RoleGuard component
+- [x] Create Permission type definitions
+- [x] Create Role type definitions with dataAccess field
+- [x] Implement usePermissions hook
+- [x] Create hasPermission function
+- [x] Create canAccessProject function
+- [x] Create canAccessSensitiveData function
+- [x] Create isSuperAdmin/isFinanceManager/isProjectManager helpers
+- [x] Create PermissionGuard component
+- [x] Create RoleGuard component
 
 ### 2.2 User Management
-- [ ] Create users API service (`src/services/api/users.ts`)
-- [ ] Create useUsers hook with React Query
-- [ ] Create Users list page with search
-- [ ] Implement user filters (by role, status)
-- [ ] Create User detail view
-- [ ] Create Add/Edit user modal
-- [ ] Implement role assignment interface
-- [ ] Implement project assignment for managers
-- [ ] Implement user status toggle (active/inactive)
+- [x] Create users API service (`src/services/api/users.ts`)
+- [x] Create useUsers hook with React Query
+- [x] Create Users list page with search
+- [x] Implement user filters (by role, status)
+- [x] Create User detail view
+- [x] Create Add/Edit user modal
+- [x] Implement role assignment interface
+- [x] Implement project assignment for managers
+- [x] Implement user status toggle (active/inactive)
 - [ ] Add bulk user import (CSV)
 
 ### 2.3 Role Management
-- [ ] Create roles API service (`src/services/api/roles.ts`)
-- [ ] Create useRoles hook
-- [ ] Create Roles list page
-- [ ] Create Role detail view
-- [ ] Create Add/Edit role modal
-- [ ] Build interactive permission matrix component
-- [ ] Implement dataAccess settings
-- [ ] Protect system roles from deletion
+- [x] Create roles API service (`src/services/api/roles.ts`)
+- [x] Create useRoles hook
+- [x] Create Roles list page
+- [x] Create Role detail view
+- [x] Create Add/Edit role modal
+- [x] Build interactive permission matrix component
+- [x] Implement dataAccess settings
+- [x] Protect system roles from deletion
 - [ ] Add role duplication feature
 
 ### 2.4 Audit Logging System
-- [ ] Create auditLogs API service
-- [ ] Create useAuditLogs hook
-- [ ] Implement audit log creation utility
-- [ ] Create Audit Log viewer page
-- [ ] Add filters (by module, user, action, date)
+- [x] Create auditLogs API service
+- [x] Create useAuditLogs hook
+- [x] Implement audit log creation utility
+- [x] Create Audit Log viewer page
+- [x] Add filters (by module, user, action, date)
 - [ ] Add export functionality
-- [ ] Log all user management actions
-- [ ] Log all role management actions
-- [ ] Log all permission changes
+- [x] Log all user management actions
+- [x] Log all role management actions
+- [x] Log all permission changes
 
 ### Phase 2 Acceptance Criteria
-- [ ] Super admin can view all users
-- [ ] Super admin can create/edit/deactivate users
-- [ ] Super admin can assign roles to users
-- [ ] Super admin can assign projects to project managers
-- [ ] Super admin can create/edit custom roles
-- [ ] Permission matrix correctly displays all permissions
-- [ ] System roles cannot be deleted
-- [ ] Permissions correctly restrict access across app
-- [ ] Project managers cannot access other projects
-- [ ] Project managers cannot see sensitive financial data
-- [ ] Audit logs capture all RBAC changes
-- [ ] Audit log viewer works with filters
+- [x] Super admin can view all users
+- [x] Super admin can create/edit/deactivate users
+- [x] Super admin can assign roles to users
+- [x] Super admin can assign projects to project managers
+- [x] Super admin can create/edit custom roles
+- [x] Permission matrix correctly displays all permissions
+- [x] System roles cannot be deleted
+- [x] Permissions correctly restrict access across app
+- [x] Project managers cannot access other projects
+- [x] Project managers cannot see sensitive financial data
+- [x] Audit logs capture all RBAC changes
+- [x] Audit log viewer works with filters
 
 ---
 
@@ -165,84 +165,84 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 **Duration**: 4-5 days | **Priority**: High
 
 ### 3.1 Finance Module - Expense CRUD
-- [ ] Create expenses API service
-- [ ] Create useExpenses hook
-- [ ] Create Expense type definitions
-- [ ] Build expense list page with filters
-- [ ] Implement expense status filters
-- [ ] Create expense detail view
-- [ ] Create expense form with validation
-- [ ] Implement receipt upload to Storage
-- [ ] Create receipt preview component
-- [ ] Add expense categories management
+- [x] Create expenses API service
+- [x] Create useExpenses hook
+- [x] Create Expense type definitions
+- [x] Build expense list page with filters
+- [x] Implement expense status filters
+- [x] Create expense detail view
+- [x] Create expense form with validation
+- [x] Implement receipt upload to Storage
+- [x] Create receipt preview component
+- [x] Add expense categories management
 
 ### 3.2 Finance Module - Approval Workflow
-- [ ] Create approval queue page (Finance Manager view)
-- [ ] Implement approve action
-- [ ] Implement reject action with reason
-- [ ] Implement "needs more info" action
-- [ ] Add comment system to expenses
+- [x] Create approval queue page (Finance Manager view)
+- [x] Implement approve action
+- [x] Implement reject action with reason
+- [x] Implement "needs more info" action
+- [x] Add comment system to expenses
 - [ ] Send notifications on status changes
-- [ ] Update security rules for approval workflow
-- [ ] Add expense history/audit trail
+- [x] Update security rules for approval workflow
+- [x] Add expense history/audit trail
 
 ### 3.3 Finance Module - Reports & Sensitive Data
-- [ ] Create financial dashboard
-- [ ] Build expense summary charts (Recharts)
-- [ ] Implement category breakdown
-- [ ] Create project cost analysis
-- [ ] Implement PDF export (jsPDF)
-- [ ] Implement Excel export (SheetJS)
-- [ ] Hide sensitive data from project managers
-- [ ] Create budget tracking per project
+- [x] Create financial dashboard
+- [x] Build expense summary charts (Recharts)
+- [x] Implement category breakdown
+- [x] Create project cost analysis
+- [x] Implement PDF export (jsPDF)
+- [x] Implement Excel export (SheetJS)
+- [x] Hide sensitive data from project managers
+- [x] Create budget tracking per project
 
 ### 3.4 Document Module - Core
-- [ ] Create documents API service
-- [ ] Create useDocuments hook
-- [ ] Create Document type definitions
-- [ ] Build document library page
-- [ ] Implement folder tree navigation
-- [ ] Create folder CRUD operations
-- [ ] Implement file upload (drag & drop)
-- [ ] Handle multi-file upload
-- [ ] Create file preview modal
-- [ ] Implement file download
+- [x] Create documents API service
+- [x] Create useDocuments hook
+- [x] Create Document type definitions
+- [x] Build document library page
+- [x] Implement folder tree navigation
+- [x] Create folder CRUD operations
+- [x] Implement file upload (drag & drop)
+- [x] Handle multi-file upload
+- [x] Create file preview modal
+- [x] Implement file download
 
 ### 3.5 Document Module - Advanced Features
-- [ ] Implement version control
-- [ ] Create version history viewer
+- [x] Implement version control
+- [x] Create version history viewer
 - [ ] Implement full-text search
-- [ ] Create access control per document
-- [ ] Implement document sharing (internal users)
+- [x] Create access control per document
+- [x] Implement document sharing (internal users)
 - [ ] Implement external sharing with expiry links
-- [ ] Mark sensitive documents
-- [ ] Create document categories/tags
-- [ ] Update security rules for documents
+- [x] Mark sensitive documents
+- [x] Create document categories/tags
+- [x] Update security rules for documents
 
 ### 3.6 Google Drive Integration
-- [ ] Set up Google Drive API client
-- [ ] Implement OAuth token refresh
-- [ ] Create Drive service (`src/services/google/drive.ts`)
-- [ ] Link project folders to Drive
+- [x] Set up Google Drive API client
+- [x] Implement OAuth token refresh
+- [x] Create Drive service (`src/services/google/drive.ts`)
+- [x] Link project folders to Drive
 - [ ] Implement two-way sync (optional)
-- [ ] Create "Import from Drive" feature
-- [ ] Open documents in Google Docs viewer
+- [x] Create "Import from Drive" feature
+- [x] Open documents in Google Docs viewer
 
 ### Phase 3 Acceptance Criteria
-- [ ] Users can submit expenses with receipts
-- [ ] Receipts upload to Firebase Storage correctly
-- [ ] Finance managers see approval queue
-- [ ] Approve/reject workflow functions correctly
-- [ ] Rejection requires reason
+- [x] Users can submit expenses with receipts
+- [x] Receipts upload to Firebase Storage correctly
+- [x] Finance managers see approval queue
+- [x] Approve/reject workflow functions correctly
+- [x] Rejection requires reason
 - [ ] Notifications sent on status changes
-- [ ] Financial reports export to PDF/Excel
-- [ ] Project managers cannot see sensitive financial data
-- [ ] Documents upload via drag & drop
-- [ ] Folder navigation works
-- [ ] Version history maintained
+- [x] Financial reports export to PDF/Excel
+- [x] Project managers cannot see sensitive financial data
+- [x] Documents upload via drag & drop
+- [x] Folder navigation works
+- [x] Version history maintained
 - [ ] Document search returns relevant results
-- [ ] Access control per document enforced
-- [ ] Google Drive integration works
+- [x] Access control per document enforced
+- [x] Google Drive integration works
 
 ---
 
@@ -250,108 +250,108 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 **Duration**: 4-5 days | **Priority**: High
 
 ### 4.1 Project Module - CRUD
-- [ ] Create projects API service
-- [ ] Create useProjects hook
-- [ ] Create Project type definitions
-- [ ] Create project list page with filters
-- [ ] Implement project status filters
-- [ ] Create project detail page
-- [ ] Create project form with validation
-- [ ] Implement project code auto-generation
-- [ ] Create project overview dashboard
+- [x] Create projects API service
+- [x] Create useProjects hook
+- [x] Create Project type definitions
+- [x] Create project list page with filters
+- [x] Implement project status filters
+- [x] Create project detail page
+- [x] Create project form with validation
+- [x] Implement project code auto-generation
+- [x] Create project overview dashboard
 
 ### 4.2 Project Module - Team & Timeline
-- [ ] Implement team member assignment
-- [ ] Create team workload view
-- [ ] Build milestone tracker
-- [ ] Create milestone CRUD
-- [ ] Implement milestone status updates
-- [ ] Create project timeline view
-- [ ] Link milestones to calendar
+- [x] Implement team member assignment
+- [x] Create team workload view
+- [x] Build milestone tracker
+- [x] Create milestone CRUD
+- [x] Implement milestone status updates
+- [x] Create project timeline view
+- [x] Link milestones to calendar
 
 ### 4.3 Project Module - Budget & Sensitive Data
-- [ ] Implement budget tracking
-- [ ] Create budget vs actual view
-- [ ] Create sensitiveData subcollection
-- [ ] Implement security rules for sensitive data
-- [ ] Build sensitive data form (admin/finance only)
-- [ ] Hide sensitive data from project managers
+- [x] Implement budget tracking
+- [x] Create budget vs actual view
+- [x] Create sensitiveData subcollection
+- [x] Implement security rules for sensitive data
+- [x] Build sensitive data form (admin/finance only)
+- [x] Hide sensitive data from project managers
 
 ### 4.4 Project Module - Integrations
-- [ ] Create Google Drive folder on project creation
-- [ ] Create Google Calendar for project
-- [ ] Sync milestones to calendar
-- [ ] Display Drive files in project
-- [ ] Display calendar events in project
+- [x] Create Google Drive folder on project creation
+- [x] Create Google Calendar for project
+- [x] Sync milestones to calendar
+- [x] Display Drive files in project
+- [x] Display calendar events in project
 
 ### 4.5 Task Module - CRUD
-- [ ] Create tasks API service
-- [ ] Create useTasks hook
-- [ ] Create Task type definitions
-- [ ] Create task list view
-- [ ] Create task detail modal
-- [ ] Create task form with validation
-- [ ] Implement task priority levels
-- [ ] Implement task labels/tags
+- [x] Create tasks API service
+- [x] Create useTasks hook
+- [x] Create Task type definitions
+- [x] Create task list view
+- [x] Create task detail modal
+- [x] Create task form with validation
+- [x] Implement task priority levels
+- [x] Implement task labels/tags
 - [ ] Create checklist feature
 
 ### 4.6 Task Module - Kanban Board (Trello-style)
-- [ ] Set up @dnd-kit for drag and drop
-- [ ] Create KanbanBoard component
-- [ ] Create KanbanColumn component
-- [ ] Create draggable TaskCard component
-- [ ] Implement drag between columns
-- [ ] Implement reorder within column
-- [ ] Add optimistic updates
-- [ ] Create real-time sync with Firestore
-- [ ] Add quick edit on card
+- [x] Set up @dnd-kit for drag and drop
+- [x] Create KanbanBoard component
+- [x] Create KanbanColumn component
+- [x] Create draggable TaskCard component
+- [x] Implement drag between columns
+- [x] Implement reorder within column
+- [x] Add optimistic updates
+- [x] Create real-time sync with Firestore
+- [x] Add quick edit on card
 - [ ] Implement WIP limits (optional)
 
 ### 4.7 Task Module - Views & Features
 - [ ] Create calendar view for tasks
-- [ ] Create list view with sorting
-- [ ] Implement filters (assignee, priority, label, date)
-- [ ] Create "My Tasks" page
+- [x] Create list view with sorting
+- [x] Implement filters (assignee, priority, label, date)
+- [x] Create "My Tasks" page
 - [ ] Implement task dependencies (optional)
 - [ ] Create task templates (optional)
 
 ### 4.8 Task Module - Collaboration
-- [ ] Create comments system
+- [x] Create comments system
 - [ ] Implement @mentions in comments
-- [ ] Create activity feed per task
-- [ ] Implement file attachments to tasks
+- [x] Create activity feed per task
+- [x] Implement file attachments to tasks
 - [ ] Send notifications on assignment
 - [ ] Send notifications on comments
 
 ### 4.9 Google Calendar Integration
-- [ ] Set up Google Calendar API client
-- [ ] Create calendar service
-- [ ] Sync task deadlines to calendar
-- [ ] Display calendar events in task views
-- [ ] Create events from portal
+- [x] Set up Google Calendar API client
+- [x] Create calendar service
+- [x] Sync task deadlines to calendar
+- [x] Display calendar events in task views
+- [x] Create events from portal
 
 ### 4.10 Google Meet Integration
-- [ ] Create Meet service
-- [ ] Implement instant meeting link generation
-- [ ] Add "Start Meet" button on tasks
-- [ ] Add "Start Meet" button on projects
+- [x] Create Meet service
+- [x] Implement instant meeting link generation
+- [x] Add "Start Meet" button on tasks
+- [x] Add "Start Meet" button on projects
 - [ ] Save meeting notes to task
 
 ### Phase 4 Acceptance Criteria
-- [ ] Projects can be created with milestones
-- [ ] Team members can be assigned to projects
-- [ ] Project managers can only see their projects
-- [ ] Sensitive project data hidden from project managers
-- [ ] Budget tracking works correctly
-- [ ] Google Drive folder created per project
-- [ ] Google Calendar synced with milestones
-- [ ] Tasks can be created and assigned
-- [ ] Kanban board drag-drop works smoothly
-- [ ] Real-time updates on task changes
+- [x] Projects can be created with milestones
+- [x] Team members can be assigned to projects
+- [x] Project managers can only see their projects
+- [x] Sensitive project data hidden from project managers
+- [x] Budget tracking works correctly
+- [x] Google Drive folder created per project
+- [x] Google Calendar synced with milestones
+- [x] Tasks can be created and assigned
+- [x] Kanban board drag-drop works smoothly
+- [x] Real-time updates on task changes
 - [ ] Calendar view shows tasks by due date
-- [ ] Comments sync in real-time
+- [x] Comments sync in real-time
 - [ ] @mentions notify users
-- [ ] Google Meet links can be generated
+- [x] Google Meet links can be generated
 
 ---
 
@@ -490,43 +490,43 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 - [ ] Test on mobile devices
 
 ### 6.5 Unit Testing
-- [ ] Set up Vitest configuration
-- [ ] Create test utilities and mocks
-- [ ] Write useAuth hook tests
-- [ ] Write usePermissions hook tests
-- [ ] Write project access tests
-- [ ] Write sensitive data access tests
+- [x] Set up Vitest configuration
+- [x] Create test utilities and mocks
+- [x] Write useAuth hook tests
+- [x] Write usePermissions hook tests
+- [x] Write project access tests
+- [x] Write sensitive data access tests
 - [ ] Write service layer tests
 - [ ] Write utility function tests
 - [ ] Achieve >80% overall coverage
 
 ### 6.6 Integration Testing
-- [ ] Set up Firebase emulators for tests
-- [ ] Write authentication flow tests
-- [ ] Write RBAC permission tests
-- [ ] Write project access control tests
-- [ ] Write expense workflow tests
-- [ ] Write task CRUD tests
-- [ ] Write Kanban drag-drop tests
+- [x] Set up Firebase emulators for tests
+- [x] Write authentication flow tests
+- [x] Write RBAC permission tests
+- [x] Write project access control tests
+- [x] Write expense workflow tests
+- [x] Write task CRUD tests
+- [x] Write Kanban drag-drop tests
 
 ### 6.7 E2E Testing
-- [ ] Set up Playwright configuration
-- [ ] Write login/logout flow tests
-- [ ] Write expense submission flow
-- [ ] Write task management flow
-- [ ] Write project creation flow
-- [ ] Write admin user management flow
+- [x] Set up Playwright configuration
+- [x] Write login/logout flow tests
+- [x] Write expense submission flow
+- [x] Write task management flow
+- [x] Write project creation flow
+- [x] Write admin user management flow
 - [ ] Test on multiple browsers
 
 ### 6.8 CI/CD Pipeline
-- [ ] Create GitHub Actions workflow
-- [ ] Configure lint job
-- [ ] Configure test job
-- [ ] Configure build job
-- [ ] Set up preview deployments for PRs
-- [ ] Configure production deployment on main
+- [x] Create GitHub Actions workflow
+- [x] Configure lint job
+- [x] Configure test job
+- [x] Configure build job
+- [x] Set up preview deployments for PRs
+- [x] Configure production deployment on main
 - [ ] Add status badges to README
-- [ ] Set up Codecov for coverage
+- [x] Set up Codecov for coverage
 
 ### 6.9 Production Deployment
 - [ ] Configure Firebase Hosting

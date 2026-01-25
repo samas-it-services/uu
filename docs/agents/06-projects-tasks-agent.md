@@ -27,7 +27,7 @@
 ## Phase 4 Tasks
 
 ### Project Data Models
-- [ ] Create `src/types/project.ts`:
+- [x] Create `src/types/project.ts`:
   ```typescript
   interface Project {
     id: string;
@@ -67,7 +67,7 @@
   ```
 
 ### Task Data Models
-- [ ] Create `src/types/task.ts`:
+- [x] Create `src/types/task.ts`:
   ```typescript
   interface Task {
     id: string;
@@ -96,195 +96,195 @@
   ```
 
 ### Project API Service
-- [ ] Create `src/services/api/projects.ts`
-- [ ] `getProjects(filters)` - respects user access
-- [ ] `getProjectById(id)` - check access
-- [ ] `getMyProjects()` - managed + member projects
-- [ ] `createProject(data)` - creates Drive folder, Calendar
-- [ ] `updateProject(id, data)`
-- [ ] `deleteProject(id)` - super admin only
-- [ ] `addTeamMember(projectId, userId)`
-- [ ] `removeTeamMember(projectId, userId)`
+- [x] Create `src/services/api/projects.ts`
+- [x] `getProjects(filters)` - respects user access
+- [x] `getProjectById(id)` - check access
+- [x] `getMyProjects()` - managed + member projects
+- [x] `createProject(data)` - creates Drive folder, Calendar
+- [x] `updateProject(id, data)`
+- [x] `deleteProject(id)` - super admin only
+- [x] `addTeamMember(projectId, userId)`
+- [x] `removeTeamMember(projectId, userId)`
 - [ ] `updateMilestone(projectId, milestone)`
 
 ### Project Sensitive Data API
-- [ ] `getSensitiveData(projectId)` - finance/admin only
-- [ ] `updateSensitiveData(projectId, data)`
-- [ ] Verify access before returning data
+- [x] `getSensitiveData(projectId)` - finance/admin only
+- [x] `updateSensitiveData(projectId, data)`
+- [x] Verify access before returning data
 
 ### Task API Service
-- [ ] Create `src/services/api/tasks.ts`
-- [ ] `getProjectTasks(projectId)` - all tasks for project
-- [ ] `getTasksByStatus(projectId, status)` - for Kanban
-- [ ] `getTaskById(id)`
-- [ ] `getMyTasks()` - assigned to current user
-- [ ] `createTask(data)`
-- [ ] `updateTask(id, data)`
-- [ ] `deleteTask(id)`
-- [ ] `updateTaskStatus(id, status, order)` - for drag
-- [ ] `reorderTasks(taskIds, startOrder)` - batch update
-- [ ] `addComment(taskId, comment)`
-- [ ] `addAttachment(taskId, file)`
+- [x] Create `src/services/api/tasks.ts`
+- [x] `getProjectTasks(projectId)` - all tasks for project
+- [x] `getTasksByStatus(projectId, status)` - for Kanban
+- [x] `getTaskById(id)`
+- [x] `getMyTasks()` - assigned to current user
+- [x] `createTask(data)`
+- [x] `updateTask(id, data)`
+- [x] `deleteTask(id)`
+- [x] `updateTaskStatus(id, status, order)` - for drag
+- [x] `reorderTasks(taskIds, startOrder)` - batch update
+- [x] `addComment(taskId, comment)`
+- [x] `addAttachment(taskId, file)`
 
 ### React Query Hooks - Projects
-- [ ] Create `src/hooks/useProjects.ts`
-- [ ] `useProjects(filters)`
-- [ ] `useProject(id)`
-- [ ] `useMyProjects()`
-- [ ] `useProjectSensitiveData(id)` - protected
-- [ ] `useCreateProject()` - mutation
-- [ ] `useUpdateProject()` - mutation
-- [ ] `useDeleteProject()` - mutation
+- [x] Create `src/hooks/useProjects.ts`
+- [x] `useProjects(filters)`
+- [x] `useProject(id)`
+- [x] `useMyProjects()`
+- [x] `useProjectSensitiveData(id)` - protected
+- [x] `useCreateProject()` - mutation
+- [x] `useUpdateProject()` - mutation
+- [x] `useDeleteProject()` - mutation
 
 ### React Query Hooks - Tasks
-- [ ] Create `src/hooks/useTasks.ts`
-- [ ] `useProjectTasks(projectId)`
-- [ ] `useTask(id)`
-- [ ] `useMyTasks()`
-- [ ] `useTaskComments(taskId)`
-- [ ] `useCreateTask()` - mutation
-- [ ] `useUpdateTask()` - mutation
-- [ ] `useMoveTask()` - mutation with optimistic update
+- [x] Create `src/hooks/useTasks.ts`
+- [x] `useProjectTasks(projectId)`
+- [x] `useTask(id)`
+- [x] `useMyTasks()`
+- [x] `useTaskComments(taskId)`
+- [x] `useCreateTask()` - mutation
+- [x] `useUpdateTask()` - mutation
+- [x] `useMoveTask()` - mutation with optimistic update
 
 ### Kanban Board Hook
-- [ ] Create `src/hooks/useTaskBoard.ts`
-- [ ] Real-time subscription to tasks
-- [ ] Handle task changes (add/modify/remove)
-- [ ] Optimistic updates for drag operations
-- [ ] Rollback on error
+- [x] Create `src/hooks/useTaskBoard.ts`
+- [x] Real-time subscription to tasks
+- [x] Handle task changes (add/modify/remove)
+- [x] Optimistic updates for drag operations
+- [x] Rollback on error
 
 ### Project List Page
-- [ ] Create `src/pages/projects/ProjectsPage.tsx`
-- [ ] Show projects as cards or table
-- [ ] Filter by status
-- [ ] Search by name
-- [ ] Different views based on role:
-  - [ ] Super Admin: all projects
-  - [ ] Finance: all projects (read-only)
-  - [ ] Project Manager: managed projects only
-  - [ ] Employee: member projects only
+- [x] Create `src/pages/projects/ProjectsPage.tsx`
+- [x] Show projects as cards or table
+- [x] Filter by status
+- [x] Search by name
+- [x] Different views based on role:
+  - [x] Super Admin: all projects
+  - [x] Finance: all projects (read-only)
+  - [x] Project Manager: managed projects only
+  - [x] Employee: member projects only
 
 ### Project Detail Page
-- [ ] Create `src/pages/projects/ProjectDetailPage.tsx`
-- [ ] Tabbed interface: Overview, Tasks, Board, Files, Calendar, Team, Settings
-- [ ] Overview: stats, milestones, activity
-- [ ] Show budget (hide sensitive from PM)
+- [x] Create `src/pages/projects/ProjectDetailPage.tsx`
+- [x] Tabbed interface: Overview, Tasks, Board, Files, Calendar, Team, Settings
+- [x] Overview: stats, milestones, activity
+- [x] Show budget (hide sensitive from PM)
 
 ### New/Edit Project Form
-- [ ] Create project form with validation
-- [ ] Auto-generate project code (PRJ-001)
-- [ ] Team member selection
-- [ ] Milestone management
-- [ ] Budget input (only for admin/finance)
-- [ ] Integration toggles (Drive, Calendar)
+- [x] Create project form with validation
+- [x] Auto-generate project code (PRJ-001)
+- [x] Team member selection
+- [x] Milestone management
+- [x] Budget input (only for admin/finance)
+- [x] Integration toggles (Drive, Calendar)
 
 ### Milestone Management
-- [ ] Create milestone form
-- [ ] Display milestone timeline
-- [ ] Update milestone status
-- [ ] Link milestones to tasks
-- [ ] Sync to Google Calendar
+- [x] Create milestone form
+- [x] Display milestone timeline
+- [x] Update milestone status
+- [x] Link milestones to tasks
+- [x] Sync to Google Calendar
 
 ### Team Management
-- [ ] List team members
-- [ ] Add/remove members
+- [x] List team members
+- [x] Add/remove members
 - [ ] Show workload per member
 - [ ] Role within project (optional)
 
 ### Kanban Board Implementation
-- [ ] Set up @dnd-kit
-- [ ] Create `KanbanBoard` component
-- [ ] Create `KanbanColumn` component (droppable)
-- [ ] Create `TaskCard` component (draggable)
-- [ ] Drag between columns (status change)
-- [ ] Drag within column (reorder)
-- [ ] Add task inline
+- [x] Set up @dnd-kit
+- [x] Create `KanbanBoard` component
+- [x] Create `KanbanColumn` component (droppable)
+- [x] Create `TaskCard` component (draggable)
+- [x] Drag between columns (status change)
+- [x] Drag within column (reorder)
+- [x] Add task inline
 - [ ] WIP limits per column (optional)
 - [ ] Column management (add/edit/delete)
-- [ ] Smooth animations
-- [ ] Mobile touch support
+- [x] Smooth animations
+- [x] Mobile touch support
 
 ### Task Card Features
-- [ ] Title with edit on click
-- [ ] Priority indicator (color)
-- [ ] Labels/tags
-- [ ] Assignee avatars
-- [ ] Due date with overdue styling
-- [ ] Checklist progress bar
-- [ ] Comment count
-- [ ] Attachment indicator
-- [ ] Quick actions menu
+- [x] Title with edit on click
+- [x] Priority indicator (color)
+- [x] Labels/tags
+- [x] Assignee avatars
+- [x] Due date with overdue styling
+- [x] Checklist progress bar
+- [x] Comment count
+- [x] Attachment indicator
+- [x] Quick actions menu
 
 ### Task Detail Modal
-- [ ] Full task details
-- [ ] Editable title/description
-- [ ] Status dropdown
-- [ ] Assignee picker (multi-select)
-- [ ] Priority picker
-- [ ] Label picker
-- [ ] Due date picker
-- [ ] Checklist management (add/toggle/delete)
-- [ ] Attachments (upload/view/delete)
-- [ ] Comments with @mentions
+- [x] Full task details
+- [x] Editable title/description
+- [x] Status dropdown
+- [x] Assignee picker (multi-select)
+- [x] Priority picker
+- [x] Label picker
+- [x] Due date picker
+- [x] Checklist management (add/toggle/delete)
+- [x] Attachments (upload/view/delete)
+- [x] Comments with @mentions
 - [ ] Activity history
-- [ ] "Start Meet" button
+- [x] "Start Meet" button
 
 ### Task Views
-- [ ] Kanban board (default)
-- [ ] List view (sortable table)
+- [x] Kanban board (default)
+- [x] List view (sortable table)
 - [ ] Calendar view (tasks by due date)
 - [ ] Timeline/Gantt view (optional)
-- [ ] My Tasks page (personal view)
+- [x] My Tasks page (personal view)
 
 ### Task Filters
-- [ ] Filter by assignee
-- [ ] Filter by priority
-- [ ] Filter by label
-- [ ] Filter by due date (overdue, today, week)
-- [ ] Filter by status
-- [ ] Clear all filters
+- [x] Filter by assignee
+- [x] Filter by priority
+- [x] Filter by label
+- [x] Filter by due date (overdue, today, week)
+- [x] Filter by status
+- [x] Clear all filters
 
 ### Comments System
-- [ ] Real-time comments
-- [ ] @mention users
+- [x] Real-time comments
+- [x] @mention users
 - [ ] Parse mentions and notify
-- [ ] Attachment in comments
-- [ ] Edit own comments
-- [ ] Delete own comments
+- [x] Attachment in comments
+- [x] Edit own comments
+- [x] Delete own comments
 
 ### Google Calendar Integration
-- [ ] Create `src/services/google/calendar.ts`
-- [ ] Create project calendar on project create
-- [ ] Sync milestones as events
-- [ ] Sync task due dates (optional)
-- [ ] Display calendar in project view
-- [ ] Create events from portal
+- [x] Create `src/services/google/calendar.ts`
+- [x] Create project calendar on project create
+- [x] Sync milestones as events
+- [x] Sync task due dates (optional)
+- [x] Display calendar in project view
+- [x] Create events from portal
 - [ ] Show team availability
 
 ### Google Meet Integration
-- [ ] Create `src/services/google/meet.ts`
-- [ ] Generate instant Meet link
-- [ ] "Start Meet" on task detail
-- [ ] "Start Meet" on project
-- [ ] Invite team members
+- [x] Create `src/services/google/meet.ts`
+- [x] Generate instant Meet link
+- [x] "Start Meet" on task detail
+- [x] "Start Meet" on project
+- [x] Invite team members
 - [ ] Save meeting notes to task
 
 ### Project-Scoped Access
-- [ ] Verify users can only see their projects
-- [ ] Hide sensitive data from project managers
-- [ ] Project assets only visible to project team
-- [ ] Project documents scoped
+- [x] Verify users can only see their projects
+- [x] Hide sensitive data from project managers
+- [x] Project assets only visible to project team
+- [x] Project documents scoped
 
 ---
 
 ## Testing Requirements
 
-- [ ] Test project CRUD
-- [ ] Test task CRUD
-- [ ] Test Kanban drag operations
+- [x] Test project CRUD
+- [x] Test task CRUD
+- [x] Test Kanban drag operations
 - [ ] Test real-time updates
-- [ ] Test project access control
-- [ ] Test sensitive data protection
+- [x] Test project access control
+- [x] Test sensitive data protection
 - [ ] Test calendar sync
 - [ ] Test Meet link generation
 
@@ -292,15 +292,40 @@
 
 ## Acceptance Criteria
 
-- [ ] Projects can be created with milestones
-- [ ] Team members can be assigned
-- [ ] Project managers only see their projects
-- [ ] Sensitive data hidden from project managers
-- [ ] Budget tracking works
-- [ ] Tasks can be created and assigned
-- [ ] **Kanban board drag-drop works smoothly**
-- [ ] **Real-time updates on task changes**
-- [ ] Comments sync in real-time
+- [x] Projects can be created with milestones
+- [x] Team members can be assigned
+- [x] Project managers only see their projects
+- [x] Sensitive data hidden from project managers
+- [x] Budget tracking works
+- [x] Tasks can be created and assigned
+- [x] **Kanban board drag-drop works smoothly**
+- [x] **Real-time updates on task changes**
+- [x] Comments sync in real-time
 - [ ] @mentions notify users
-- [ ] Google Calendar synced
-- [ ] Google Meet links generated
+- [x] Google Calendar synced
+- [x] Google Meet links generated
+
+---
+
+## Phase 7 Tasks (Custom Fields Extension)
+
+### Custom Fields System
+- [ ] Create `src/types/customField.ts`
+- [ ] Create `src/services/api/customFields.ts`
+- [ ] Create `src/hooks/useCustomFields.ts`
+- [ ] Update TaskModal with dynamic custom fields section
+- [ ] Update TaskCard with custom field badges
+- [ ] Create CustomFieldsPage (admin)
+- [ ] Create CustomFieldEditor component
+
+### Extended Task Type
+- [ ] Add `taskType` enum field (growth, experimentation, operational, etc.)
+- [ ] Add `category` enum field (seo, marketing, engineering, etc.)
+- [ ] Add `phase` field (project phase)
+- [ ] Add `sprint` field (sprint identifier)
+- [ ] Add `goal` field (task goal description)
+- [ ] Add `acceptanceCriteria` field
+- [ ] Add `successMetrics` field
+- [ ] Add `completionDate` field (separate from completedAt)
+- [ ] Add `externalId` field (external system reference)
+- [ ] Add `customFields` map for dynamic fields
