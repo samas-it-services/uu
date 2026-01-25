@@ -6,6 +6,8 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { UsersPage, RolesPage, AuditLogsPage } from '@/pages/admin';
+import { ExpensesPage, ApprovalsPage, ReportsPage } from '@/pages/finance';
+import { DocumentsPage } from '@/pages/documents';
 import { Spinner } from '@/components/ui/Spinner';
 
 const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -30,6 +32,26 @@ const AdminRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { hasPermission } = usePermissions();
 
   if (!hasPermission('rbac', 'read')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const FinanceRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission('finance', 'read')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const DocumentsRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission('documents', 'read')) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -70,6 +92,38 @@ export const App: FC = () => {
                     <AdminRoute>
                       <AuditLogsPage />
                     </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/finance/expenses"
+                  element={
+                    <FinanceRoute>
+                      <ExpensesPage />
+                    </FinanceRoute>
+                  }
+                />
+                <Route
+                  path="/finance/approvals"
+                  element={
+                    <FinanceRoute>
+                      <ApprovalsPage />
+                    </FinanceRoute>
+                  }
+                />
+                <Route
+                  path="/finance/reports"
+                  element={
+                    <FinanceRoute>
+                      <ReportsPage />
+                    </FinanceRoute>
+                  }
+                />
+                <Route
+                  path="/documents"
+                  element={
+                    <DocumentsRoute>
+                      <DocumentsPage />
+                    </DocumentsRoute>
                   }
                 />
               </Routes>

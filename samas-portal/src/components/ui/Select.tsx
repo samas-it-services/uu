@@ -69,3 +69,8 @@ export const SelectItem: FC<SelectItemProps> = ({ value, children, disabled }) =
     </SelectPrimitive.Item>
   );
 };
+
+// Additional exports for compatibility
+export const SelectTrigger = SelectPrimitive.Trigger;
+export const SelectContent = SelectPrimitive.Content;
+export const SelectValue = SelectPrimitive.Value;

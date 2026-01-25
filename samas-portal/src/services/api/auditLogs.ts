@@ -28,13 +28,31 @@ export type AuditAction =
   | 'role.updated'
   | 'role.deleted'
   | 'role.permissions_updated'
+  | 'expense.created'
+  | 'expense.updated'
+  | 'expense.deleted'
+  | 'expense.submitted'
+  | 'expense.approved'
+  | 'expense.rejected'
+  | 'expense.paid'
+  | 'approval.created'
+  | 'approval.approved'
+  | 'approval.rejected'
+  | 'approval.cancelled'
+  | 'document.uploaded'
+  | 'document.updated'
+  | 'document.deleted'
+  | 'document.shared'
+  | 'document.version_uploaded'
+  | 'folder.created'
+  | 'folder.deleted'
   | 'login'
   | 'logout';
 
 export interface AuditLog {
   id: string;
   action: AuditAction;
-  entityType: 'user' | 'role' | 'session';
+  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder';
   entityId: string;
   entityName: string;
   performedBy: {
@@ -54,7 +72,7 @@ export interface AuditLog {
 
 export interface CreateAuditLogData {
   action: AuditAction;
-  entityType: 'user' | 'role' | 'session';
+  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder';
   entityId: string;
   entityName: string;
   performedBy: {
@@ -71,7 +89,7 @@ export interface CreateAuditLogData {
 
 export interface AuditLogFilters {
   action?: AuditAction;
-  entityType?: 'user' | 'role' | 'session';
+  entityType?: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder';
   entityId?: string;
   performedById?: string;
   startDate?: Date;

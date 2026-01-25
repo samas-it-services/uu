@@ -12,3 +12,12 @@ export type {
   AuditLogFilters,
   PaginatedResult,
 } from './auditLogs';
+
+export { expensesApi } from './expenses';
+export type { CreateExpenseData, UpdateExpenseData, ExpenseFilters } from './expenses';
+
+export { approvalsApi } from './approvals';
+export type { CreateApprovalData } from './approvals';
+
+export { documentsApi } from './documents';
+export type { CreateDocumentData, UpdateDocumentData, CreateFolderData, DocumentFilters } from './documents';
