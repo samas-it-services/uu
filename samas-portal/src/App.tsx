@@ -8,6 +8,8 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { UsersPage, RolesPage, AuditLogsPage } from '@/pages/admin';
 import { ExpensesPage, ApprovalsPage, ReportsPage } from '@/pages/finance';
 import { DocumentsPage } from '@/pages/documents';
+import { ProjectsPage, ProjectDetailPage } from '@/pages/projects';
+import { KanbanPage } from '@/pages/tasks';
 import { Spinner } from '@/components/ui/Spinner';
 
 const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -52,6 +54,26 @@ const DocumentsRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { hasPermission } = usePermissions();
 
   if (!hasPermission('documents', 'read')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const ProjectsRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission('projects', 'read')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const TasksRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission('tasks', 'read')) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -124,6 +146,30 @@ export const App: FC = () => {
                     <DocumentsRoute>
                       <DocumentsPage />
                     </DocumentsRoute>
+                  }
+                />
+                <Route
+                  path="/projects"
+                  element={
+                    <ProjectsRoute>
+                      <ProjectsPage />
+                    </ProjectsRoute>
+                  }
+                />
+                <Route
+                  path="/projects/:id"
+                  element={
+                    <ProjectsRoute>
+                      <ProjectDetailPage />
+                    </ProjectsRoute>
+                  }
+                />
+                <Route
+                  path="/tasks"
+                  element={
+                    <TasksRoute>
+                      <KanbanPage />
+                    </TasksRoute>
                   }
                 />
               </Routes>

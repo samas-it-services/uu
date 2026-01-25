@@ -46,13 +46,26 @@ export type AuditAction =
   | 'document.version_uploaded'
   | 'folder.created'
   | 'folder.deleted'
+  | 'project.created'
+  | 'project.updated'
+  | 'project.deleted'
+  | 'project.archived'
+  | 'project.status_changed'
+  | 'project.team_member_added'
+  | 'project.team_member_removed'
+  | 'task.created'
+  | 'task.updated'
+  | 'task.deleted'
+  | 'task.status_changed'
+  | 'task.assigned'
+  | 'task.comment_added'
   | 'login'
   | 'logout';
 
 export interface AuditLog {
   id: string;
   action: AuditAction;
-  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder';
+  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder' | 'project' | 'task';
   entityId: string;
   entityName: string;
   performedBy: {
@@ -72,7 +85,7 @@ export interface AuditLog {
 
 export interface CreateAuditLogData {
   action: AuditAction;
-  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder';
+  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder' | 'project' | 'task';
   entityId: string;
   entityName: string;
   performedBy: {

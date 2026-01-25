@@ -21,3 +21,9 @@ export type { CreateApprovalData } from './approvals';
 
 export { documentsApi } from './documents';
 export type { CreateDocumentData, UpdateDocumentData, CreateFolderData, DocumentFilters } from './documents';
+
+export { projectsApi } from './projects';
+export type { CreateProjectData, UpdateProjectData, ProjectFilters } from './projects';
+
+export { tasksApi } from './tasks';
+export type { CreateTaskData, UpdateTaskData, TaskFilters, ReorderTaskData } from './tasks';
