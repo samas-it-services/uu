@@ -9,8 +9,9 @@ import {
   Paperclip,
   AlertCircle,
   GripVertical,
+  ExternalLink,
 } from 'lucide-react';
-import { Task, TaskPriority } from '@/types/task';
+import { Task, TaskPriority, TaskType, TaskCategory } from '@/types/task';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
@@ -30,6 +31,25 @@ const priorityConfig: Record<
   medium: { label: 'Medium', className: 'border-l-blue-500', badgeVariant: 'default' },
   high: { label: 'High', className: 'border-l-orange-500', badgeVariant: 'warning' },
   urgent: { label: 'Urgent', className: 'border-l-red-500', badgeVariant: 'destructive' },
+};
+
+const taskTypeConfig: Record<TaskType, { label: string; className: string }> = {
+  growth: { label: 'Growth', className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
+  experimentation: { label: 'Exp', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
+  operational: { label: 'Ops', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
+  maintenance: { label: 'Maint', className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' },
+  bug: { label: 'Bug', className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
+  feature: { label: 'Feat', className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400' },
+};
+
+const categoryConfig: Record<TaskCategory, { label: string; className: string }> = {
+  seo: { label: 'SEO', className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
+  marketing: { label: 'Marketing', className: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400' },
+  engineering: { label: 'Eng', className: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400' },
+  design: { label: 'Design', className: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400' },
+  content: { label: 'Content', className: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' },
+  analytics: { label: 'Analytics', className: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400' },
+  other: { label: 'Other', className: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' },
 };
 
 export const TaskCard: FC<TaskCardProps> = ({ task, onClick, isDragging }) => {
@@ -93,6 +113,28 @@ export const TaskCard: FC<TaskCardProps> = ({ task, onClick, isDragging }) => {
             </p>
           )}
 
+          {/* Task Type and Category Badges */}
+          {(task.taskType || task.category || task.phase) && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {task.taskType && (
+                <span className={cn('text-xs px-1.5 py-0.5 rounded font-medium', taskTypeConfig[task.taskType].className)}>
+                  {taskTypeConfig[task.taskType].label}
+                </span>
+              )}
+              {task.category && (
+                <span className={cn('text-xs px-1.5 py-0.5 rounded font-medium', categoryConfig[task.category].className)}>
+                  {categoryConfig[task.category].label}
+                </span>
+              )}
+              {task.phase && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                  {task.phase}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Tags */}
           {task.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2">
               {task.tags.slice(0, 3).map((tag) => (
@@ -147,6 +189,13 @@ export const TaskCard: FC<TaskCardProps> = ({ task, onClick, isDragging }) => {
                 <div className="flex items-center gap-1">
                   <Paperclip className="h-3 w-3" />
                   <span>{task.attachments.length}</span>
+                </div>
+              )}
+
+              {task.externalId && (
+                <div className="flex items-center gap-1 text-gray-400" title={`External: ${task.externalId}`}>
+                  <ExternalLink className="h-3 w-3" />
+                  <span className="truncate max-w-[60px]">{task.externalId}</span>
                 </div>
               )}
             </div>

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Phase 7: Custom Fields System
+- Created `src/types/customField.ts` with CustomFieldType, CustomFieldValue, CustomFieldDefinition
+- Extended `src/types/task.ts` with TaskType, TaskCategory enums and 12 new task fields
+- Created `src/services/api/customFields.ts` with full CRUD operations for field definitions
+- Created `src/hooks/useCustomFields.ts` with React Query hooks for custom fields
+- Updated TaskModal with collapsible sections for Categorization, Goals & Criteria, Notes, External Reference
+- Updated TaskCard to display task type badges, category badges, and phase indicators
+- Added seed script support with gitignore rules
+
 ### Documentation
 - Updated `docs/implementation-checklist.md` to reflect completed Phases 2-4 status
 - Updated `docs/PRD.md` with Custom Fields System specification (Section 10.5)

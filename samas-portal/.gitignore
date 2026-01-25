@@ -55,3 +55,8 @@ yarn-error.log*
 
 # Misc
 *.tsbuildinfo
+
+# Seed scripts (contain data, not for commit)
+scripts/seed*.ts
+scripts/seed*.js
+scripts/*.csv
