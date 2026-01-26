@@ -12,7 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
-import { User } from '@/types/user';
+import { User, UserRole } from '@/types/user';
 
 const USERS_COLLECTION = 'users';
 
@@ -20,18 +20,16 @@ export interface CreateUserData {
   email: string;
   displayName: string;
   photoURL?: string;
-  roles: string[];
-  managedProjects?: string[];
-  memberProjects?: string[];
+  role: UserRole;
+  projects?: string[];
   isActive?: boolean;
 }
 
 export interface UpdateUserData {
   displayName?: string;
   photoURL?: string;
-  roles?: string[];
-  managedProjects?: string[];
-  memberProjects?: string[];
+  role?: UserRole;
+  projects?: string[];
   isActive?: boolean;
 }
 
@@ -78,8 +76,7 @@ export const usersApi = {
     const docRef = await addDoc(usersRef, {
       ...data,
       photoURL: data.photoURL || '',
-      managedProjects: data.managedProjects || [],
-      memberProjects: data.memberProjects || [],
+      projects: data.projects || [],
       isActive: data.isActive ?? true,
       status: 'offline',
       statusMessage: '',
@@ -129,23 +126,18 @@ export const usersApi = {
     });
   },
 
-  async assignRoles(id: string, roleIds: string[]): Promise<void> {
+  async assignRole(id: string, roleId: UserRole): Promise<void> {
     const docRef = doc(db, USERS_COLLECTION, id);
     await updateDoc(docRef, {
-      roles: roleIds,
+      role: roleId,
       updatedAt: Timestamp.now(),
     });
   },
 
-  async assignProjects(
-    id: string,
-    managedProjects: string[],
-    memberProjects: string[]
-  ): Promise<void> {
+  async assignProjects(id: string, projects: string[]): Promise<void> {
     const docRef = doc(db, USERS_COLLECTION, id);
     await updateDoc(docRef, {
-      managedProjects,
-      memberProjects,
+      projects,
       updatedAt: Timestamp.now(),
     });
   },

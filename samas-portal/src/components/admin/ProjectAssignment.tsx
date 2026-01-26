@@ -23,7 +23,7 @@ interface ProjectAssignmentProps {
   onOpenChange: (open: boolean) => void;
   user: User | null;
   projects: Project[];
-  onSubmit: (userId: string, managedProjects: string[], memberProjects: string[]) => void;
+  onSubmit: (userId: string, projects: string[]) => void;
   isLoading?: boolean;
 }
 
@@ -35,39 +35,25 @@ export const ProjectAssignment: FC<ProjectAssignmentProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
-  const [managedProjects, setManagedProjects] = useState<string[]>([]);
-  const [memberProjects, setMemberProjects] = useState<string[]>([]);
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
 
   useEffect(() => {
     if (user) {
-      setManagedProjects(user.managedProjects || []);
-      setMemberProjects(user.memberProjects || []);
+      setSelectedProjects(user.projects || []);
     } else {
-      setManagedProjects([]);
-      setMemberProjects([]);
+      setSelectedProjects([]);
     }
   }, [user]);
 
-  const handleToggleManaged = (projectId: string) => {
-    setManagedProjects((prev) =>
-      prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
-    );
-    // If project is managed, also ensure it's not just a member
-    setMemberProjects((prev) => prev.filter((id) => id !== projectId));
-  };
-
-  const handleToggleMember = (projectId: string) => {
-    // If already managed, don't allow adding as just member
-    if (managedProjects.includes(projectId)) return;
-
-    setMemberProjects((prev) =>
+  const handleToggleProject = (projectId: string) => {
+    setSelectedProjects((prev) =>
       prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
     );
   };
 
   const handleSubmit = () => {
     if (user) {
-      onSubmit(user.id, managedProjects, memberProjects);
+      onSubmit(user.id, selectedProjects);
     }
   };
 
@@ -80,23 +66,19 @@ export const ProjectAssignment: FC<ProjectAssignmentProps> = ({
           <DialogTitle>Assign Projects</DialogTitle>
           <DialogDescription>
             Select projects for <strong>{user.displayName}</strong>
+            <br />
+            <span className="text-xs">
+              Role: <Badge variant="outline">{user.role}</Badge>
+            </span>
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4 max-h-[400px] overflow-y-auto">
           <div className="text-sm text-muted-foreground mb-2">
-            <Badge variant="default" className="mr-2">
-              Manager
-            </Badge>
-            Full access to manage project
-            <br />
-            <Badge variant="outline" className="mr-2 mt-1">
-              Member
-            </Badge>
-            View and participate in project
+            Select projects this user should have access to. Their permissions within each project
+            are determined by their role ({user.role}).
           </div>
           {projects.map((project) => {
-            const isManaged = managedProjects.includes(project.id);
-            const isMember = memberProjects.includes(project.id);
+            const isSelected = selectedProjects.includes(project.id);
 
             return (
               <div key={project.id} className="flex items-center justify-between p-3 rounded-lg border">
@@ -111,16 +93,8 @@ export const ProjectAssignment: FC<ProjectAssignmentProps> = ({
                 <div className="flex items-center gap-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      checked={isManaged}
-                      onCheckedChange={() => handleToggleManaged(project.id)}
-                    />
-                    <span className="text-sm">Manager</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={isMember || isManaged}
-                      onCheckedChange={() => handleToggleMember(project.id)}
-                      disabled={isManaged}
+                      checked={isSelected}
+                      onCheckedChange={() => handleToggleProject(project.id)}
                     />
                     <span className="text-sm">Member</span>
                   </div>

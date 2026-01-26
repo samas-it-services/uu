@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - RBAC System Overhaul
+- Simplified user model: `roles: string[]` changed to `role: string` (single role per user)
+- Simplified project membership: `managedProjects/memberProjects` changed to `projects: string[]`
+- Updated role permissions to use `actions[]` and `scope` pattern instead of boolean flags
+- Defined 5 core roles: `superuser`, `project_manager`, `qa_manager`, `analyst`, `finance_incharge`
+- Updated Firestore security rules to match new RBAC specification
+- Created `docs/rbac.md` with complete RBAC documentation
+- Created `scripts/seedRolesAndUsers.ts` for seeding roles and users
+- Updated TypeScript types in `src/types/user.ts` and `src/types/role.ts`
+
+
+
 ### Added - Phase 7: Custom Fields System
 - Created `src/types/customField.ts` with CustomFieldType, CustomFieldValue, CustomFieldDefinition
 - Extended `src/types/task.ts` with TaskType, TaskCategory enums and 12 new task fields
@@ -16,7 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated TaskCard to display task type badges, category badges, and phase indicators
 - Added seed script support with gitignore rules
 
+### Fixed
+- Created `cors.json` for Firebase Storage CORS configuration (fixes file upload from custom domain)
+- Added CORS configuration section to `docs/TDD.md` (Section 10.2)
+
 ### Documentation
+- Updated `docs/implementation-checklist.md` with Phase 7 Custom Fields status
 - Updated `docs/implementation-checklist.md` to reflect completed Phases 2-4 status
 - Updated `docs/PRD.md` with Custom Fields System specification (Section 10.5)
 - Updated `docs/TDD.md` with CustomFieldDefinition interface and extended Task type

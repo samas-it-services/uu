@@ -14,7 +14,7 @@ interface UserCardProps {
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onToggleStatus: (user: User) => void;
-  onAssignRoles: (user: User) => void;
+  onAssignRole: (user: User) => void;
 }
 
 export const UserCard: FC<UserCardProps> = ({
@@ -23,9 +23,9 @@ export const UserCard: FC<UserCardProps> = ({
   onEdit,
   onDelete,
   onToggleStatus,
-  onAssignRoles,
+  onAssignRole,
 }) => {
-  const userRoles = roles.filter((role) => user.roles.includes(role.id));
+  const userRole = roles.find((role) => role.id === user.role);
 
   return (
     <Card className={cn(!user.isActive && 'opacity-60')}>
@@ -45,19 +45,18 @@ export const UserCard: FC<UserCardProps> = ({
             </div>
             <p className="text-sm text-muted-foreground truncate">{user.email}</p>
             <div className="flex flex-wrap gap-1 mt-2">
-              {userRoles.map((role) => (
-                <Badge key={role.id} variant="outline" className="text-xs">
-                  {role.name}
+              {userRole ? (
+                <Badge variant="outline" className="text-xs">
+                  {userRole.name}
                 </Badge>
-              ))}
-              {userRoles.length === 0 && (
-                <span className="text-xs text-muted-foreground">No roles assigned</span>
+              ) : (
+                <span className="text-xs text-muted-foreground">No role assigned</span>
               )}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-          <Button variant="ghost" size="sm" onClick={() => onAssignRoles(user)} title="Assign Roles">
+          <Button variant="ghost" size="sm" onClick={() => onAssignRole(user)} title="Assign Role">
             <Shield className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onEdit(user)} title="Edit User">

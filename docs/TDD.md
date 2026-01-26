@@ -10,6 +10,8 @@
 | 1.0 | 2025-01-24 | System | Initial TDD |
 | 1.1 | 2025-01-24 | System | Added Google APIs, Kanban, Presence |
 | 1.2 | 2025-01-25 | System | Added Custom Fields System, Extended Task Interface |
+| 1.3 | 2025-01-25 | System | Added Cloud Storage CORS Configuration (Section 10.2) |
+| 1.4 | 2025-01-25 | System | Updated RBAC system with new roles (superuser, project_manager, qa_manager, analyst, finance_incharge) |
 
 ---
 
@@ -214,19 +216,18 @@ firestore/
 
 #### users
 ```typescript
+/**
+ * User Document
+ * See docs/rbac.md for role definitions
+ */
 interface User {
   id: string;                          // Firebase Auth UID
   email: string;
   displayName: string;
   photoURL: string;
-  roles: string[];                     // ['employee', 'project_manager']
+  role: string;                        // Single role: 'superuser' | 'project_manager' | 'qa_manager' | 'analyst' | 'finance_incharge'
+  projects: string[];                  // Array of projectIds user is member of
   isActive: boolean;
-  
-  // Projects this user manages (for project managers)
-  managedProjects: string[];           // Project IDs
-  
-  // Projects this user is member of
-  memberProjects: string[];            // Project IDs
   
   // Presence
   status: 'online' | 'away' | 'busy' | 'offline';
@@ -260,12 +261,23 @@ interface User {
 
 #### roles
 ```typescript
+/**
+ * RBAC Role Definitions
+ * See docs/rbac.md for complete specification
+ *
+ * Available roles:
+ * - superuser: Full system access, RBAC management
+ * - project_manager: Manage assigned projects
+ * - qa_manager: QA lead with announcement creation
+ * - analyst: Standard team member
+ * - finance_incharge: Finance team with global finance access
+ */
 interface Role {
-  id: string;
+  id: string;                          // e.g., "superuser", "project_manager"
   name: string;
   description: string;
   isSystem: boolean;                   // Cannot be deleted
-  
+
   permissions: {
     finance: Permission;
     documents: Permission;
@@ -275,23 +287,14 @@ interface Role {
     announcements: Permission;
     rbac: Permission;
   };
-  
-  // Data access restrictions
-  dataAccess: {
-    allProjects: boolean;              // Can see all projects
-    sensitiveFinancials: boolean;      // Can see profit margins, rates
-    globalAssets: boolean;             // Can see company-wide assets
-  };
-  
+
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
 interface Permission {
-  create: boolean;
-  read: boolean;
-  update: boolean;
-  delete: boolean;
+  actions: string[];                   // ['create', 'read', 'update', 'delete']
+  scope: string;                       // 'global' | 'project' | 'own' | 'none'
 }
 ```
 
@@ -2272,6 +2275,44 @@ export const sanitizeHTML = (html: string): string => {
   });
 };
 ```
+
+### 10.2 Cloud Storage CORS Configuration
+
+For file uploads from custom domains, Firebase Storage requires explicit CORS configuration.
+
+**Configuration File: `cors.json`**
+```json
+[
+  {
+    "origin": ["https://uu.samas.tech", "http://localhost:5173", "http://localhost:5174"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "Content-Length",
+      "User-Agent",
+      "x-goog-resumable",
+      "x-firebase-storage-version"
+    ]
+  }
+]
+```
+
+**Apply CORS Configuration:**
+```bash
+# Using gsutil (Google Cloud SDK)
+gsutil cors set cors.json gs://uu-portal-60426.firebasestorage.app
+
+# Verify configuration
+gsutil cors get gs://uu-portal-60426.firebasestorage.app
+```
+
+**Alternative:** Configure via Google Cloud Console:
+1. Go to Cloud Console → Storage → Browser
+2. Select the bucket `uu-portal-60426.firebasestorage.app`
+3. Click "Edit CORS configuration" in the bucket settings
+4. Paste the JSON configuration
 
 ---
 

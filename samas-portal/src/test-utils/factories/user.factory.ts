@@ -3,7 +3,7 @@
  * Creates mock user data for testing
  */
 
-import { User, PresenceStatus, UserPreferences } from '@/types/user';
+import { User, PresenceStatus, UserPreferences, UserRole } from '@/types/user';
 
 let userCounter = 0;
 
@@ -28,9 +28,8 @@ export interface UserFactoryOptions {
   email?: string;
   displayName?: string;
   photoURL?: string;
-  roles?: string[];
-  managedProjects?: string[];
-  memberProjects?: string[];
+  role?: UserRole;
+  projects?: string[];
   isActive?: boolean;
   status?: PresenceStatus;
   statusMessage?: string;
@@ -46,9 +45,8 @@ export function createMockUser(options: UserFactoryOptions = {}): User {
     email: options.email || `user${userCounter}@example.com`,
     displayName: options.displayName || `Test User ${userCounter}`,
     photoURL: options.photoURL || `https://example.com/avatar${userCounter}.jpg`,
-    roles: options.roles || ['employee'],
-    managedProjects: options.managedProjects || [],
-    memberProjects: options.memberProjects || [],
+    role: options.role || 'analyst',
+    projects: options.projects || [],
     isActive: options.isActive ?? true,
     status: options.status || 'offline',
     statusMessage: options.statusMessage || '',
@@ -63,40 +61,56 @@ export function createMockUser(options: UserFactoryOptions = {}): User {
   };
 }
 
-export function createMockSuperAdmin(options: UserFactoryOptions = {}): User {
+export function createMockSuperuser(options: UserFactoryOptions = {}): User {
   return createMockUser({
     ...options,
     email: options.email || 'bill@samas.tech',
-    displayName: options.displayName || 'Bill Admin',
-    roles: ['super_admin'],
+    displayName: options.displayName || 'Syed Bilgrami',
+    role: 'superuser',
   });
 }
 
-export function createMockFinanceManager(options: UserFactoryOptions = {}): User {
+export function createMockFinanceIncharge(options: UserFactoryOptions = {}): User {
   return createMockUser({
     ...options,
-    displayName: options.displayName || 'Finance Manager',
-    roles: ['finance_manager'],
+    email: options.email || 'saminas.samas@gmail.com',
+    displayName: options.displayName || 'Samina Mukhtar',
+    role: 'finance_incharge',
   });
 }
 
 export function createMockProjectManager(options: UserFactoryOptions = {}): User {
   return createMockUser({
     ...options,
-    displayName: options.displayName || 'Project Manager',
-    roles: ['project_manager'],
-    managedProjects: options.managedProjects || ['project-1'],
+    email: options.email || 'shahneela.samas@gmail.com',
+    displayName: options.displayName || 'Shahneela Chaudhry',
+    role: 'project_manager',
+    projects: options.projects || ['project-1'],
   });
 }
 
-export function createMockEmployee(options: UserFactoryOptions = {}): User {
+export function createMockQAManager(options: UserFactoryOptions = {}): User {
   return createMockUser({
     ...options,
-    displayName: options.displayName || 'Employee',
-    roles: ['employee'],
-    memberProjects: options.memberProjects || ['project-1'],
+    displayName: options.displayName || 'QA Manager',
+    role: 'qa_manager',
+    projects: options.projects || ['project-1'],
   });
 }
+
+export function createMockAnalyst(options: UserFactoryOptions = {}): User {
+  return createMockUser({
+    ...options,
+    displayName: options.displayName || 'Analyst',
+    role: 'analyst',
+    projects: options.projects || ['project-1'],
+  });
+}
+
+// Legacy aliases for backward compatibility
+export const createMockSuperAdmin = createMockSuperuser;
+export const createMockFinanceManager = createMockFinanceIncharge;
+export const createMockEmployee = createMockAnalyst;
 
 // Create multiple users
 export function createMockUsers(count: number, options: UserFactoryOptions = {}): User[] {

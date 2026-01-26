@@ -1,14 +1,16 @@
 import { Timestamp } from 'firebase/firestore';
 
-export interface Role {
-  id: string;
-  name: string;
-  description: string;
-  isSystem: boolean;
-  permissions: RolePermissions;
-  dataAccess: DataAccess;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+/**
+ * RBAC Role Definitions
+ * See docs/rbac.md for complete specification
+ */
+
+export type PermissionScope = 'global' | 'project' | 'own' | 'none';
+export type PermissionAction = 'create' | 'read' | 'update' | 'delete';
+
+export interface Permission {
+  actions: PermissionAction[];
+  scope: PermissionScope;
 }
 
 export interface RolePermissions {
@@ -21,18 +23,14 @@ export interface RolePermissions {
   rbac: Permission;
 }
 
-export interface Permission {
-  create: boolean;
-  read: boolean;
-  update: boolean;
-  delete: boolean;
-}
-
-export interface DataAccess {
-  allProjects: boolean;
-  sensitiveFinancials: boolean;
-  globalAssets: boolean;
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
+  permissions: RolePermissions;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export type Module = keyof RolePermissions;
-export type Action = keyof Permission;

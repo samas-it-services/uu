@@ -225,10 +225,15 @@ Create a comprehensive, secure company portal for SaMas IT Services (uu.samas.te
 
 | Email | Name | Role | Access |
 |-------|------|------|--------|
-| bill@samas.tech | Syed A Bilgrami | Super Admin | Full |
-| bilgrami@gmail.com | Syed A Bilgrami | Super Admin | Full |
-| saminas.samas@gmail.com | Samina Mukhtar | Finance Manager | Finance + Read |
-| shahneela.samas@gmail.com | Shahneela Chaudhry | Project Manager | Own Projects |
+TBD
+
+### 5.5 RBAC Implementation
+
+See [docs/rbac.md](rbac.md) for detailed RBAC specification including:
+- Complete role definitions and permissions matrix
+- Visibility scopes for documents and assets
+- Firestore security rules
+- Data seeding scripts
 
 ---
 

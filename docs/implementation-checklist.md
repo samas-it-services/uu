@@ -22,6 +22,7 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 | Phase 4: Projects & Tasks | ✅ Complete | 100% | Projects & Tasks Agent |
 | Phase 5: Assets & News | 🔴 Not Started | 0% | Assets + Announcements Agents |
 | Phase 6: PWA & Deploy | 🟡 In Progress | 70% | PWA + Testing + Docs Agents |
+| Phase 7: Custom Fields | 🟡 In Progress | 80% | Custom Fields Agent |
 
 ---
 
@@ -71,7 +72,8 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 - [x] Write Firestore security rules for users collection
 - [x] Write Firestore security rules for roles collection
 - [x] Write Firestore security rules for presence collection
-- [ ] Write Cloud Storage security rules
+- [x] Write Cloud Storage security rules (`storage.rules`)
+- [ ] Configure Cloud Storage CORS for custom domain (`cors.json`)
 - [ ] Test security rules with emulator
 - [x] Document security rules
 
@@ -508,6 +510,8 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 - [x] Write expense workflow tests
 - [x] Write task CRUD tests
 - [x] Write Kanban drag-drop tests
+- [ ] Write document upload tests (useDocuments hook)
+- [ ] Write custom fields tests (useCustomFields hook)
 
 ### 6.7 E2E Testing
 - [x] Set up Playwright configuration
@@ -563,6 +567,42 @@ This checklist tracks the complete implementation of the SaMas Portal across all
 - [ ] CI/CD pipeline runs successfully
 - [ ] Production site accessible at uu.samas.tech
 - [ ] All documentation complete
+
+---
+
+## Phase 7: Custom Fields System
+**Duration**: 2-3 days | **Priority**: Medium
+
+### 7.1 Custom Field Types & Schema
+- [x] Create `src/types/customField.ts` with CustomFieldType, CustomFieldValue, CustomFieldDefinition
+- [x] Extend `src/types/task.ts` with TaskType, TaskCategory enums
+- [x] Add 12 new enterprise fields to Task type (taskType, category, phase, sprint, goal, etc.)
+
+### 7.2 Custom Fields API & Hooks
+- [x] Create `src/services/api/customFields.ts` with CRUD operations
+- [x] Create `src/hooks/useCustomFields.ts` with React Query hooks
+- [ ] Add Firestore security rules for customFields collection
+- [ ] Create admin UI for managing custom field definitions
+
+### 7.3 Task UI Enhancements
+- [x] Update TaskModal with collapsible sections (Categorization, Goals, Notes, External Ref)
+- [x] Update TaskCard with task type badges, category badges, phase indicators
+- [ ] Add custom field rendering in task detail view
+- [ ] Create filtering by custom fields
+
+### 7.4 Data Import & Seeding
+- [x] Create `scripts/seedIlmRedTasks.ts` with Firebase Admin SDK
+- [x] Support for service account key and ADC authentication
+- [x] Creates ilm.red project and 15 sample tasks
+- [x] Configure gitignore for seed scripts
+
+### Phase 7 Acceptance Criteria
+- [x] Custom field types defined (text, number, enum, multi_enum, date, person, checkbox, url)
+- [x] Extended task schema supports enterprise fields
+- [x] TaskModal displays collapsible field sections
+- [x] TaskCard shows type/category badges
+- [ ] Custom field definitions can be created/managed by admin
+- [ ] Tasks can be filtered by custom fields
 
 ---
 

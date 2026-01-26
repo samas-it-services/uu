@@ -25,16 +25,22 @@ import { auth, db, googleProvider } from '@/services/firebase/config';
 import { User } from '@/types/user';
 import { Role } from '@/types/role';
 
+import { UserRole } from '@/types/user';
+
 const SUPER_ADMINS = ['bill@samas.tech', 'bilgrami@gmail.com'];
-const DEFAULT_ROLES: Record<string, string[]> = {
-  'saminas.samas@gmail.com': ['finance_manager'],
-  'shahneela.samas@gmail.com': ['project_manager'],
+const DEFAULT_ROLES: Record<string, UserRole> = {
+  'bill@samas.tech': 'superuser',
+  'hinas.samas@gmail.com': 'analyst',
+  'saminas.samas@gmail.com': 'finance_incharge',
+  'asmaaslam.samas@gmail.com': 'analyst',
+  'shamsa.samas0@gmail.com': 'analyst',
+  'shahneela.samas@gmail.com': 'project_manager',
 };
 
 interface AuthContextValue {
   user: User | null;
   firebaseUser: FirebaseUser | null;
-  roles: Role[];
+  userRole: Role | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -45,7 +51,7 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [userRole, setUserRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Listen to auth state changes
@@ -55,7 +61,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
       if (!fbUser) {
         setUser(null);
-        setRoles([]);
+        setUserRole(null);
         setLoading(false);
         return;
       }
@@ -68,24 +74,23 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         // Create new user document
         const email = fbUser.email || '';
         const isSuperAdmin = SUPER_ADMINS.includes(email);
-        const predefinedRoles = DEFAULT_ROLES[email];
+        const predefinedRole = DEFAULT_ROLES[email];
 
-        let userRoles: string[];
+        let userRoleId: UserRole;
         if (isSuperAdmin) {
-          userRoles = ['super_admin'];
-        } else if (predefinedRoles) {
-          userRoles = predefinedRoles;
+          userRoleId = 'superuser';
+        } else if (predefinedRole) {
+          userRoleId = predefinedRole;
         } else {
-          userRoles = ['employee'];
+          userRoleId = 'analyst'; // Default role
         }
 
         const newUser = {
           email,
           displayName: fbUser.displayName || '',
           photoURL: fbUser.photoURL || '',
-          roles: userRoles,
-          managedProjects: [] as string[],
-          memberProjects: [] as string[],
+          role: userRoleId,
+          projects: [] as string[],
           isActive: true,
           status: 'online' as const,
           statusMessage: '',
@@ -125,18 +130,18 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         const userData = { id: snap.id, ...snap.data() } as User;
         setUser(userData);
 
-        // Fetch roles
-        const rolePromises = userData.roles.map(async (roleId) => {
-          const roleRef = doc(db, 'roles', roleId);
+        // Fetch the user's role
+        if (userData.role) {
+          const roleRef = doc(db, 'roles', userData.role);
           const roleSnap = await getDoc(roleRef);
           if (roleSnap.exists()) {
-            return { id: roleSnap.id, ...roleSnap.data() } as Role;
+            setUserRole({ id: roleSnap.id, ...roleSnap.data() } as Role);
+          } else {
+            setUserRole(null);
           }
-          return null;
-        });
-
-        const fetchedRoles = await Promise.all(rolePromises);
-        setRoles(fetchedRoles.filter(Boolean) as Role[]);
+        } else {
+          setUserRole(null);
+        }
       }
     });
 
@@ -184,7 +189,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       value={{
         user,
         firebaseUser,
-        roles,
+        userRole,
         loading,
         signInWithGoogle,
         signOut,

@@ -170,18 +170,18 @@ export const useToggleUserStatus = () => {
   });
 };
 
-export const useAssignUserRoles = () => {
+export const useAssignUserRole = () => {
   const queryClient = useQueryClient();
   const { success, error } = useToast();
   const { user: currentUser } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ id, roleIds }: { id: string; roleIds: string[] }) => {
+    mutationFn: async ({ id, roleId }: { id: string; roleId: string }) => {
       const existingUser = await usersApi.getById(id);
-      await usersApi.assignRoles(id, roleIds);
+      await usersApi.assignRole(id, roleId as import('@/types/user').UserRole);
       if (currentUser && existingUser) {
         await createAuditLog({
-          action: 'user.roles_assigned',
+          action: 'user.role_assigned',
           entityType: 'user',
           entityId: id,
           entityName: existingUser.displayName,
@@ -191,18 +191,18 @@ export const useAssignUserRoles = () => {
             displayName: currentUser.displayName,
           },
           changes: {
-            before: { roles: existingUser.roles },
-            after: { roles: roleIds },
+            before: { role: existingUser.role },
+            after: { role: roleId },
           },
         });
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
-      success('Roles assigned successfully');
+      success('Role assigned successfully');
     },
     onError: (err) => {
-      error(`Failed to assign roles: ${err.message}`);
+      error(`Failed to assign role: ${err.message}`);
     },
   });
 };
@@ -215,15 +215,13 @@ export const useAssignUserProjects = () => {
   return useMutation({
     mutationFn: async ({
       id,
-      managedProjects,
-      memberProjects,
+      projects,
     }: {
       id: string;
-      managedProjects: string[];
-      memberProjects: string[];
+      projects: string[];
     }) => {
       const existingUser = await usersApi.getById(id);
-      await usersApi.assignProjects(id, managedProjects, memberProjects);
+      await usersApi.assignProjects(id, projects);
       if (currentUser && existingUser) {
         await createAuditLog({
           action: 'user.projects_assigned',
@@ -236,11 +234,8 @@ export const useAssignUserProjects = () => {
             displayName: currentUser.displayName,
           },
           changes: {
-            before: {
-              managedProjects: existingUser.managedProjects,
-              memberProjects: existingUser.memberProjects,
-            },
-            after: { managedProjects, memberProjects },
+            before: { projects: existingUser.projects },
+            after: { projects },
           },
         });
       }

@@ -1,13 +1,23 @@
 import { Timestamp } from 'firebase/firestore';
 
+/**
+ * User Role Types
+ * See docs/rbac.md for detailed permissions
+ */
+export type UserRole =
+  | 'superuser'
+  | 'project_manager'
+  | 'qa_manager'
+  | 'analyst'
+  | 'finance_incharge';
+
 export interface User {
   id: string;
   email: string;
   displayName: string;
   photoURL: string;
-  roles: string[];
-  managedProjects: string[];
-  memberProjects: string[];
+  role: UserRole;
+  projects: string[];                  // Array of projectIds user is member of
   isActive: boolean;
   status: PresenceStatus;
   statusMessage: string;
