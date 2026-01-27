@@ -40,7 +40,7 @@ export const usePermissions = () => {
       const permission = userRole.permissions[module];
       if (!permission) return false;
 
-      return permission.actions.includes(action);
+      return permission.actions?.includes(action) ?? false;
     };
   }, [userRole, isSuperAdmin]);
 

@@ -236,6 +236,39 @@ service cloud.firestore {
         (isAnalyst() && isOwner(resource.data.createdBy));
     }
 
+    // ============ FOLDERS ============
+
+    match /folders/{folderId} {
+      allow read: if isAuthenticated() && (
+        isSuperuser() ||
+        resource.data.projectId == null ||
+        isProjectMember(resource.data.projectId)
+      );
+
+      allow create: if isAuthenticated() && (
+        isSuperuser() ||
+        isProjectManager() ||
+        ((isQAManager() || isFinanceIncharge() || isAnalyst()) &&
+         request.resource.data.createdBy == request.auth.uid)
+      );
+
+      allow update: if isAuthenticated() && (
+        isSuperuser() ||
+        (isProjectManager() && (
+          resource.data.projectId == null ||
+          isProjectMember(resource.data.projectId)
+        )) ||
+        isOwner(resource.data.createdBy)
+      );
+
+      allow delete: if isSuperuser() ||
+        (isProjectManager() && (
+          resource.data.projectId == null ||
+          isProjectMember(resource.data.projectId)
+        )) ||
+        isOwner(resource.data.createdBy);
+    }
+
     // ============ ASSETS ============
 
     match /assets/{assetId} {

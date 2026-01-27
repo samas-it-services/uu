@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.3 - 2026-01-27 | 🐛 fix: Runtime errors and folder permissions
+
+### 📄 Summary
+Fixed two critical issues: (1) TypeError on /admin/users page when checking permissions, and (2) folder creation failing due to missing Firestore security rules.
+
+### 📁 Files Changed
+- `src/hooks/usePermissions.ts` - Added optional chaining for `permission.actions`
+- `firestore.rules` - Added security rules for `folders` collection
+
+### 🧠 Rationale
+1. **Permission check crash**: The `hasPermission` function didn't handle cases where `permission.actions` was undefined (legacy/incomplete role data).
+2. **Folder creation denied**: The documents API uses a `folders` collection, but no corresponding Firestore security rules existed.
+
+### 🔄 Behavior / Compatibility Implications
+- No behavior change for permissions - returns `false` for undefined (same as no permission)
+- Folder creation now works for authenticated users with appropriate roles
+- Rules follow same pattern as documents collection
+
+### 🧪 Testing Recommendations
+- Visit /admin/users page - should load without errors
+- Create folder in documents section - should succeed
+- Run `npm test` and `npm run test:e2e`
+
+### 📌 Follow-ups
+- Seed production database with new role format
+- Add integration tests for document upload (`useDocuments.test.tsx`)
+- Implement skipped E2E tests for receipt upload in `expenses.spec.ts`
+- Add runtime validation for role documents on load
+
+---
+
 ## 0.5.2 - 2026-01-26 | 🐛 fix: Storage upload permissions and RBAC test failures
 
 ### 📄 Summary
