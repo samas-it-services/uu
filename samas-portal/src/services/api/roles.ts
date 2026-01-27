@@ -12,7 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
-import { Role, RolePermissions, DataAccess } from '@/types/role';
+import { Role, RolePermissions, Permission } from '@/types/role';
 
 const ROLES_COLLECTION = 'roles';
 
@@ -21,21 +21,17 @@ export interface CreateRoleData {
   description: string;
   isSystem?: boolean;
   permissions: RolePermissions;
-  dataAccess: DataAccess;
 }
 
 export interface UpdateRoleData {
   name?: string;
   description?: string;
   permissions?: RolePermissions;
-  dataAccess?: DataAccess;
 }
 
-const defaultPermission = {
-  create: false,
-  read: false,
-  update: false,
-  delete: false,
+const defaultPermission: Permission = {
+  actions: [],
+  scope: 'none',
 };
 
 export const defaultPermissions: RolePermissions = {
@@ -46,12 +42,6 @@ export const defaultPermissions: RolePermissions = {
   tasks: { ...defaultPermission },
   announcements: { ...defaultPermission },
   rbac: { ...defaultPermission },
-};
-
-export const defaultDataAccess: DataAccess = {
-  allProjects: false,
-  sensitiveFinancials: false,
-  globalAssets: false,
 };
 
 export const rolesApi = {
@@ -149,11 +139,4 @@ export const rolesApi = {
     });
   },
 
-  async updateDataAccess(id: string, dataAccess: DataAccess): Promise<void> {
-    const docRef = doc(db, ROLES_COLLECTION, id);
-    await updateDoc(docRef, {
-      dataAccess,
-      updatedAt: Timestamp.now(),
-    });
-  },
 };

@@ -3,7 +3,7 @@
  * Creates mock role data for testing
  */
 
-import { Role, Permission, RolePermissions, DataAccess } from '@/types/role';
+import { Role, Permission, RolePermissions, PermissionAction } from '@/types/role';
 
 let roleCounter = 0;
 
@@ -14,40 +14,33 @@ const mockTimestamp = {
 };
 
 const noPermission: Permission = {
-  create: false,
-  read: false,
-  update: false,
-  delete: false,
+  actions: [],
+  scope: 'none',
 };
 
-const readOnlyPermission: Permission = {
-  create: false,
-  read: true,
-  update: false,
-  delete: false,
-};
+const readOnlyPermission = (scope: 'global' | 'project' | 'own' = 'project'): Permission => ({
+  actions: ['read'] as PermissionAction[],
+  scope,
+});
 
-const fullPermission: Permission = {
-  create: true,
-  read: true,
-  update: true,
-  delete: true,
-};
+const fullPermission = (scope: 'global' | 'project' | 'own' = 'global'): Permission => ({
+  actions: ['create', 'read', 'update', 'delete'] as PermissionAction[],
+  scope,
+});
+
+const customPermission = (actions: PermissionAction[], scope: 'global' | 'project' | 'own' | 'none'): Permission => ({
+  actions,
+  scope,
+});
 
 const defaultPermissions: RolePermissions = {
   finance: noPermission,
-  documents: readOnlyPermission,
-  projects: readOnlyPermission,
+  documents: readOnlyPermission('project'),
+  projects: readOnlyPermission('project'),
   assets: noPermission,
-  tasks: readOnlyPermission,
-  announcements: readOnlyPermission,
+  tasks: readOnlyPermission('project'),
+  announcements: readOnlyPermission('project'),
   rbac: noPermission,
-};
-
-const defaultDataAccess: DataAccess = {
-  allProjects: false,
-  sensitiveFinancials: false,
-  globalAssets: false,
 };
 
 export interface RoleFactoryOptions {
@@ -56,7 +49,6 @@ export interface RoleFactoryOptions {
   description?: string;
   isSystem?: boolean;
   permissions?: Partial<RolePermissions>;
-  dataAccess?: Partial<DataAccess>;
 }
 
 export function createMockRole(options: RoleFactoryOptions = {}): Role {
@@ -72,10 +64,6 @@ export function createMockRole(options: RoleFactoryOptions = {}): Role {
       ...defaultPermissions,
       ...options.permissions,
     },
-    dataAccess: {
-      ...defaultDataAccess,
-      ...options.dataAccess,
-    },
     createdAt: mockTimestamp as Role['createdAt'],
     updatedAt: mockTimestamp as Role['updatedAt'],
   };
@@ -83,46 +71,36 @@ export function createMockRole(options: RoleFactoryOptions = {}): Role {
 
 export function createMockSuperAdminRole(): Role {
   return createMockRole({
-    id: 'super_admin',
-    name: 'Super Admin',
+    id: 'superuser',
+    name: 'Super User',
     description: 'Full system access',
     isSystem: true,
     permissions: {
-      finance: fullPermission,
-      documents: fullPermission,
-      projects: fullPermission,
-      assets: fullPermission,
-      tasks: fullPermission,
-      announcements: fullPermission,
-      rbac: fullPermission,
-    },
-    dataAccess: {
-      allProjects: true,
-      sensitiveFinancials: true,
-      globalAssets: true,
+      finance: fullPermission('global'),
+      documents: fullPermission('global'),
+      projects: fullPermission('global'),
+      assets: fullPermission('global'),
+      tasks: fullPermission('global'),
+      announcements: fullPermission('global'),
+      rbac: fullPermission('global'),
     },
   });
 }
 
 export function createMockFinanceManagerRole(): Role {
   return createMockRole({
-    id: 'finance_manager',
-    name: 'Finance Manager',
+    id: 'finance_incharge',
+    name: 'Finance In-charge',
     description: 'Financial management access',
     isSystem: true,
     permissions: {
-      finance: fullPermission,
-      documents: readOnlyPermission,
-      projects: readOnlyPermission,
-      assets: readOnlyPermission,
-      tasks: readOnlyPermission,
-      announcements: readOnlyPermission,
+      finance: fullPermission('global'),
+      documents: customPermission(['read', 'update'], 'project'),
+      projects: readOnlyPermission('global'),
+      assets: customPermission(['read', 'update'], 'project'),
+      tasks: customPermission(['read', 'update'], 'own'),
+      announcements: fullPermission('project'),
       rbac: noPermission,
-    },
-    dataAccess: {
-      allProjects: true,
-      sensitiveFinancials: true,
-      globalAssets: true,
     },
   });
 }
@@ -134,41 +112,31 @@ export function createMockProjectManagerRole(): Role {
     description: 'Project management access',
     isSystem: true,
     permissions: {
-      finance: readOnlyPermission,
-      documents: fullPermission,
-      projects: fullPermission,
-      assets: readOnlyPermission,
-      tasks: fullPermission,
-      announcements: readOnlyPermission,
+      finance: readOnlyPermission('project'),
+      documents: fullPermission('project'),
+      projects: customPermission(['read', 'update'], 'project'),
+      assets: fullPermission('project'),
+      tasks: fullPermission('project'),
+      announcements: fullPermission('project'),
       rbac: noPermission,
-    },
-    dataAccess: {
-      allProjects: false,
-      sensitiveFinancials: false,
-      globalAssets: false,
     },
   });
 }
 
 export function createMockEmployeeRole(): Role {
   return createMockRole({
-    id: 'employee',
-    name: 'Employee',
+    id: 'analyst',
+    name: 'Analyst',
     description: 'Basic employee access',
     isSystem: true,
     permissions: {
-      finance: { ...noPermission, read: true, create: true }, // Can read and create expenses
-      documents: readOnlyPermission,
-      projects: readOnlyPermission,
-      assets: readOnlyPermission,
-      tasks: { ...readOnlyPermission, update: true }, // Can update assigned tasks
-      announcements: readOnlyPermission,
+      finance: noPermission,
+      documents: fullPermission('own'),
+      projects: readOnlyPermission('project'),
+      assets: customPermission(['read', 'update'], 'project'),
+      tasks: customPermission(['read', 'update'], 'own'),
+      announcements: readOnlyPermission('project'),
       rbac: noPermission,
-    },
-    dataAccess: {
-      allProjects: false,
-      sensitiveFinancials: false,
-      globalAssets: false,
     },
   });
 }

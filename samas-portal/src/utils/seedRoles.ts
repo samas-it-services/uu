@@ -7,28 +7,27 @@
 
 import { collection, doc, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
-import { RolePermissions, DataAccess } from '@/types/role';
+import { RolePermissions, Permission, PermissionAction } from '@/types/role';
 
-const defaultPermission = {
-  create: false,
-  read: false,
-  update: false,
-  delete: false,
+const noPermission: Permission = {
+  actions: [],
+  scope: 'none',
 };
 
-const fullPermission = {
-  create: true,
-  read: true,
-  update: true,
-  delete: true,
-};
+const fullPermission = (scope: 'global' | 'project' | 'own' = 'global'): Permission => ({
+  actions: ['create', 'read', 'update', 'delete'] as PermissionAction[],
+  scope,
+});
 
-const readOnlyPermission = {
-  create: false,
-  read: true,
-  update: false,
-  delete: false,
-};
+const readOnlyPermission = (scope: 'global' | 'project' | 'own' = 'global'): Permission => ({
+  actions: ['read'] as PermissionAction[],
+  scope,
+});
+
+const customPermission = (actions: PermissionAction[], scope: 'global' | 'project' | 'own' | 'none'): Permission => ({
+  actions,
+  scope,
+});
 
 interface SystemRole {
   id: string;
@@ -36,48 +35,37 @@ interface SystemRole {
   description: string;
   isSystem: boolean;
   permissions: RolePermissions;
-  dataAccess: DataAccess;
 }
 
 const systemRoles: SystemRole[] = [
   {
-    id: 'super_admin',
-    name: 'Super Admin',
+    id: 'superuser',
+    name: 'Super User',
     description: 'Full system access with all permissions. Can manage users, roles, and all system settings.',
     isSystem: true,
     permissions: {
-      finance: fullPermission,
-      documents: fullPermission,
-      projects: fullPermission,
-      assets: fullPermission,
-      tasks: fullPermission,
-      announcements: fullPermission,
-      rbac: fullPermission,
-    },
-    dataAccess: {
-      allProjects: true,
-      sensitiveFinancials: true,
-      globalAssets: true,
+      finance: fullPermission('global'),
+      documents: fullPermission('global'),
+      projects: fullPermission('global'),
+      assets: fullPermission('global'),
+      tasks: fullPermission('global'),
+      announcements: fullPermission('global'),
+      rbac: fullPermission('global'),
     },
   },
   {
-    id: 'finance_manager',
-    name: 'Finance Manager',
+    id: 'finance_incharge',
+    name: 'Finance In-charge',
     description: 'Manages financial operations. Can view all projects and access sensitive financial data.',
     isSystem: true,
     permissions: {
-      finance: fullPermission,
-      documents: { ...readOnlyPermission, create: true },
-      projects: readOnlyPermission,
-      assets: readOnlyPermission,
-      tasks: readOnlyPermission,
-      announcements: readOnlyPermission,
-      rbac: defaultPermission,
-    },
-    dataAccess: {
-      allProjects: true,
-      sensitiveFinancials: true,
-      globalAssets: true,
+      finance: fullPermission('global'),
+      documents: customPermission(['read', 'update'], 'project'),
+      projects: readOnlyPermission('global'),
+      assets: customPermission(['read', 'update'], 'project'),
+      tasks: customPermission(['read', 'update'], 'own'),
+      announcements: fullPermission('project'),
+      rbac: noPermission,
     },
   },
   {
@@ -86,38 +74,43 @@ const systemRoles: SystemRole[] = [
     description: 'Manages assigned projects. Can only access their own projects and cannot view sensitive financial data.',
     isSystem: true,
     permissions: {
-      finance: { create: true, read: true, update: true, delete: false },
-      documents: fullPermission,
-      projects: fullPermission,
-      assets: { create: true, read: true, update: true, delete: false },
-      tasks: fullPermission,
-      announcements: { create: true, read: true, update: true, delete: false },
-      rbac: defaultPermission,
-    },
-    dataAccess: {
-      allProjects: false,
-      sensitiveFinancials: false,
-      globalAssets: false,
+      finance: readOnlyPermission('project'),
+      documents: fullPermission('project'),
+      projects: customPermission(['read', 'update'], 'project'),
+      assets: fullPermission('project'),
+      tasks: fullPermission('project'),
+      announcements: fullPermission('project'),
+      rbac: noPermission,
     },
   },
   {
-    id: 'employee',
-    name: 'Employee',
-    description: 'Standard employee access. Can view and participate in assigned projects.',
+    id: 'qa_manager',
+    name: 'QA Manager',
+    description: 'Quality assurance lead. Read/update on documents and assets, own tasks only.',
     isSystem: true,
     permissions: {
-      finance: defaultPermission,
-      documents: { ...readOnlyPermission, create: true },
-      projects: readOnlyPermission,
-      assets: readOnlyPermission,
-      tasks: { create: true, read: true, update: true, delete: false },
-      announcements: readOnlyPermission,
-      rbac: defaultPermission,
+      finance: readOnlyPermission('project'),
+      documents: customPermission(['read', 'update'], 'project'),
+      projects: readOnlyPermission('project'),
+      assets: customPermission(['read', 'update'], 'project'),
+      tasks: customPermission(['read', 'update'], 'own'),
+      announcements: fullPermission('project'),
+      rbac: noPermission,
     },
-    dataAccess: {
-      allProjects: false,
-      sensitiveFinancials: false,
-      globalAssets: false,
+  },
+  {
+    id: 'analyst',
+    name: 'Analyst',
+    description: 'Team member. Read all documents, CRUD on own documents, update own tasks.',
+    isSystem: true,
+    permissions: {
+      finance: noPermission,
+      documents: fullPermission('own'),
+      projects: readOnlyPermission('project'),
+      assets: customPermission(['read', 'update'], 'project'),
+      tasks: customPermission(['read', 'update'], 'own'),
+      announcements: readOnlyPermission('project'),
+      rbac: noPermission,
     },
   },
 ];

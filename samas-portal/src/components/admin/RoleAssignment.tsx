@@ -34,15 +34,17 @@ export const RoleAssignment: FC<RoleAssignmentProps> = ({
 
   useEffect(() => {
     if (user) {
-      setSelectedRoles(user.roles || []);
+      // Single role system - convert role to array for UI compatibility
+      setSelectedRoles(user.role ? [user.role] : []);
     } else {
       setSelectedRoles([]);
     }
   }, [user]);
 
   const handleToggleRole = (roleId: string) => {
+    // Single role system - only one role can be selected at a time
     setSelectedRoles((prev) =>
-      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId]
+      prev.includes(roleId) ? [] : [roleId]
     );
   };
 

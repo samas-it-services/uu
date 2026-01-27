@@ -1,7 +1,7 @@
 export { usersApi } from './users';
 export type { CreateUserData, UpdateUserData } from './users';
 
-export { rolesApi, defaultPermissions, defaultDataAccess } from './roles';
+export { rolesApi, defaultPermissions } from './roles';
 export type { CreateRoleData, UpdateRoleData } from './roles';
 
 export { auditLogsApi } from './auditLogs';

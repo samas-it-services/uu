@@ -2,8 +2,8 @@ import { FC, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Role } from '@/types/role';
-import { defaultPermissions, defaultDataAccess } from '@/services/api/roles';
+import { Role, RolePermissions } from '@/types/role';
+import { defaultPermissions } from '@/services/api/roles';
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ interface RoleModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   role: Role | null;
-  onSubmit: (data: RoleFormData & { permissions: Role['permissions']; dataAccess: Role['dataAccess'] }) => void;
+  onSubmit: (data: RoleFormData & { permissions: RolePermissions }) => void;
   isLoading?: boolean;
 }
 
@@ -44,18 +44,16 @@ export const RoleModal: FC<RoleModalProps> = ({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<RoleFormData & { permissions: Role['permissions']; dataAccess: Role['dataAccess'] }>({
+  } = useForm<RoleFormData & { permissions: RolePermissions }>({
     resolver: zodResolver(roleSchema),
     defaultValues: {
       name: '',
       description: '',
       permissions: defaultPermissions,
-      dataAccess: defaultDataAccess,
     },
   });
 
   const permissions = watch('permissions');
-  const dataAccess = watch('dataAccess');
 
   useEffect(() => {
     if (role) {
@@ -63,28 +61,22 @@ export const RoleModal: FC<RoleModalProps> = ({
         name: role.name,
         description: role.description,
         permissions: role.permissions,
-        dataAccess: role.dataAccess,
       });
     } else {
       reset({
         name: '',
         description: '',
         permissions: defaultPermissions,
-        dataAccess: defaultDataAccess,
       });
     }
   }, [role, reset]);
 
-  const handleFormSubmit = (data: RoleFormData & { permissions: Role['permissions']; dataAccess: Role['dataAccess'] }) => {
+  const handleFormSubmit = (data: RoleFormData & { permissions: RolePermissions }) => {
     onSubmit(data);
   };
 
-  const handlePermissionsChange = (newPermissions: Role['permissions']) => {
+  const handlePermissionsChange = (newPermissions: RolePermissions) => {
     setValue('permissions', newPermissions);
-  };
-
-  const handleDataAccessChange = (newDataAccess: Role['dataAccess']) => {
-    setValue('dataAccess', newDataAccess);
   };
 
   return (
@@ -122,9 +114,7 @@ export const RoleModal: FC<RoleModalProps> = ({
 
           <PermissionMatrix
             permissions={permissions}
-            dataAccess={dataAccess}
             onPermissionsChange={handlePermissionsChange}
-            onDataAccessChange={handleDataAccessChange}
             disabled={false}
           />
 

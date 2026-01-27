@@ -1,271 +1,221 @@
 # Changelog
 
-All notable changes to the SaMas Portal project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+All notable changes to this project will be documented in this file.
+The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed - RBAC System Overhaul
-- Simplified user model: `roles: string[]` changed to `role: string` (single role per user)
-- Simplified project membership: `managedProjects/memberProjects` changed to `projects: string[]`
-- Updated role permissions to use `actions[]` and `scope` pattern instead of boolean flags
-- Defined 5 core roles: `superuser`, `project_manager`, `qa_manager`, `analyst`, `finance_incharge`
-- Updated Firestore security rules to match new RBAC specification
-- Created `docs/rbac.md` with complete RBAC documentation
-- Created `scripts/seedRolesAndUsers.ts` for seeding roles and users
-- Updated TypeScript types in `src/types/user.ts` and `src/types/role.ts`
-
-
-
-### Added - Phase 7: Custom Fields System
-- Created `src/types/customField.ts` with CustomFieldType, CustomFieldValue, CustomFieldDefinition
-- Extended `src/types/task.ts` with TaskType, TaskCategory enums and 12 new task fields
-- Created `src/services/api/customFields.ts` with full CRUD operations for field definitions
-- Created `src/hooks/useCustomFields.ts` with React Query hooks for custom fields
-- Updated TaskModal with collapsible sections for Categorization, Goals & Criteria, Notes, External Reference
-- Updated TaskCard to display task type badges, category badges, and phase indicators
-- Added seed script support with gitignore rules
-
-### Fixed
-- Created `cors.json` for Firebase Storage CORS configuration (fixes file upload from custom domain)
-- Added CORS configuration section to `docs/TDD.md` (Section 10.2)
-
-### Documentation
-- Updated `docs/implementation-checklist.md` with Phase 7 Custom Fields status
-- Updated `docs/implementation-checklist.md` to reflect completed Phases 2-4 status
-- Updated `docs/PRD.md` with Custom Fields System specification (Section 10.5)
-- Updated `docs/TDD.md` with CustomFieldDefinition interface and extended Task type
-- Created `docs/architecture.md` with system architecture diagrams
-- Updated `docs/agents/06-projects-tasks-agent.md` with completed items and Phase 7 tasks
-- Created `docs/agents/13-custom-fields-agent.md` for Custom Fields Agent
-- Updated `samas-portal/.claude/CLAUDE.md` with Phase 7 agent reference
+## Format
+- **Reverse chronological order** (newest at top)
+- **Header format:** `<semantic version> - YYYY-MM-DD | <category>: <title>`
+- **Categories:** 🚀 feat | 🐛 fix | 📘 docs | 🧹 chore
 
 ---
 
-## [0.1.0] - 2025-01-25
+## 0.5.1 - 2026-01-26 | 🐛 fix: RBAC permission type system build failures
 
-### Added - Phase 1: Foundation & Firebase Setup
+### 📄 Summary
+Fixed CI lint and e2e test failures caused by the RBAC system overhaul. The new permission structure `{ actions: PermissionAction[], scope: PermissionScope }` was not fully propagated across all components, hooks, and utilities.
 
-#### Project Infrastructure
-- Initialized Vite + React 18 + TypeScript project
-- Configured ESLint and Prettier
-- Set up Tailwind CSS with custom theme and CSS variables
-- Configured path aliases (@/)
-- Created project directory structure (src/services, src/hooks, src/components, src/contexts, src/types, src/pages)
+### 📁 Files Changed
+- `scripts/seedRolesAndUsers.ts` - Fixed `any` type errors with proper `unknown` handling
+- `src/hooks/useUsers.ts` - Added missing `useAssignUserRoles` hook, fixed audit action type
+- `src/hooks/useRoles.ts` - Removed deprecated `DataAccess` import and hook
+- `src/types/role.ts` - Added `Action` alias and `DataAccess` interface for compatibility
+- `src/services/api/roles.ts` - Updated to new permission format, removed `defaultDataAccess`
+- `src/services/api/index.ts` - Removed `defaultDataAccess` export
+- `src/utils/seedRoles.ts` - Rewrote with new permission structure
+- `src/components/admin/PermissionMatrix.tsx` - Complete rewrite with actions checkboxes + scope selector
+- `src/components/admin/RoleModal.tsx` - Removed `dataAccess` references
+- `src/components/admin/RoleAssignment.tsx` - Use `user.role` (singular) not `user.roles`
+- `src/pages/admin/RolesPage.tsx` - Updated permission counting, removed `dataAccess` display
+- `src/pages/admin/UsersPage.tsx` - Fixed prop name, default role to `analyst`
+- `src/test-utils/factories/role.factory.ts` - Updated to new permission format
 
-#### Firebase Integration
-- Created Firebase project (uu-portal-60426)
-- Enabled Google Authentication provider
-- Created Firestore database with security rules
-- Configured Cloud Storage
-- Set up Firebase Hosting with custom domain (uu.samas.tech)
-- Created `.env` and `.env.production` environment files
+### 🧠 Rationale
+The RBAC overhaul changed the Permission type from boolean flags (`create`, `read`, `update`, `delete`) to an actions array with scope (`{ actions: PermissionAction[], scope: PermissionScope }`). Many files still used the old structure, causing TypeScript errors and build failures.
 
-#### Authentication System
-- Implemented AuthContext provider with full Google OAuth flow
-- Created useAuth hook
-- Implemented Google Sign-In with popup
-- Added OAuth token storage for Google APIs (Drive, Calendar)
-- Created protected route component
-- Implemented session persistence
-- Created login page UI with branding
-- Handle new user creation flow with automatic document creation
-- Auto-assign super admin role to predefined emails (bill@samas.tech, bilgrami@gmail.com)
+### 🔄 Behavior / Compatibility Implications
+- **PermissionMatrix UI** now shows a scope dropdown (Global/Project/Own/None) per module
+- **Single role system** - Users have one role, not multiple
+- **Role assignment** modal allows only one role selection at a time
+- New users default to `analyst` role
 
-#### TypeScript Types
-- Created comprehensive interfaces for: User, Role, Project, Task, Expense, Document, Asset, Announcement, Presence
-- Defined Permission and Module types for RBAC
+### 🧪 Testing Recommendations
+- Run `npm run lint` - should pass with 0 warnings
+- Run `npm run typecheck` - should pass with no errors
+- Run `npm run test:e2e` - 56 tests pass (350 skipped require auth)
 
-#### Security Rules
-- Implemented Firestore security rules for all collections
-- Added helper functions: isAuthenticated, userDocExists, isSuperAdmin, isFinanceManager, isProjectManager
-- Implemented project-scoped access control (canAccessProject, isProjectOwner, isProjectMember)
-- Protected sensitive data subcollections
-- Added user existence checks to prevent errors for new users
-
-#### UI Framework
-- Created base UI components (Button, Card, Input, Avatar, Badge, Spinner)
-- Created MainLayout component with responsive design
-- Created Sidebar navigation with permission-based filtering
-- Created Header with user menu
-- Implemented dark mode toggle with system preference detection
-- Created toast notification system with multiple variants
-- Set up responsive navigation for mobile
-
-#### PWA Setup
-- Configured Vite PWA plugin with manifest
-- Generated PWA icons (72x72 to 512x512)
-- Configured service worker with caching strategies
-- Set up offline fallback
-
-### Fixed
-- Fixed Tailwind CSS configuration for CSS variable-based colors (border-border issue)
-- Fixed Firebase project ID in .firebaserc
-- Added COOP headers (Cross-Origin-Opener-Policy: same-origin-allow-popups) for Google Sign-in popup
-- Fixed Firestore security rules to handle new users without existing documents
-- **Fixed Active Users display** - Dashboard now shows real user count from Firestore instead of hardcoded value
-
-### Testing Infrastructure
-- Created Vitest test setup with Firebase mocks (`src/test-utils/setup.ts`)
-- Created test factories for User, Role, Expense, Project, Task
-- Created Firebase mock utilities (auth, firestore, storage)
-- Created TestProviders wrapper and custom render utilities
-- **90 integration tests** for all hooks (useAuth, usePermissions, useUsers, useRoles, useAuditLogs, useExpenses, useProjects, useTasks)
-- **28 E2E tests** for Phases 1-4 (auth, dashboard, navigation, users, roles, audit logs, expenses, projects, kanban) with Playwright
-
-### Deployment
-- Deployed to Firebase Hosting
-- Configured custom domain: https://uu.samas.tech
-- SSL certificate provisioned
-- DNS configured via CNAME to Firebase
+### 📌 Follow-ups
+- Update E2E tests that depend on old permission structure
+- Seed production database with new role format
+- Update user documentation for new role assignment flow
 
 ---
 
-## [0.4.0] - 2025-01-25
+## 0.5.0 - 2026-01-26 | 🚀 feat: RBAC system overhaul
 
-### Added - Phase 4: Project & Task Management
+### 📄 Summary
+Complete overhaul of the RBAC system to simplify user roles and permissions. Changed from multi-role to single-role model, and from boolean permission flags to actions array with scope.
 
-#### Project Module
-- Created useProjects hook with React Query (CRUD, filtering, stats, team management)
-- Created projects API service (`src/services/api/projects.ts`)
-- Built ProjectsPage with filtering by status/priority, search, archive toggle
-- Built ProjectDetailPage with tabs (Overview, Team, Tasks, Documents)
-- Created ProjectCard component with stats and actions
-- Created ProjectModal for create/edit with validation
-- Implemented team member management (add/remove)
-- Created MilestoneTimeline component for milestone visualization
+### 📁 Files Changed
+- `src/types/user.ts` - `roles: string[]` → `role: string`
+- `src/types/role.ts` - New `Permission` type with `actions[]` and `scope`
+- `firestore.rules` - Updated security rules for new RBAC model
+- `docs/rbac.md` - Complete RBAC documentation
+- `scripts/seedRolesAndUsers.ts` - New seeding script
 
-#### Task Module with Kanban Board
-- Created useTasks hook with drag-drop support (CRUD, status changes, comments, attachments)
-- Created tasks API service (`src/services/api/tasks.ts`)
-- Built KanbanPage with project selection and task filtering
-- **Implemented KanbanBoard with @dnd-kit library** (drag between columns, reorder within)
-- Created KanbanColumn component (droppable)
-- Created TaskCard component (draggable) with priority indicators, assignee avatars
-- Built TaskModal with full details (title, description, status, assignee, priority, due date)
-- Created TaskComments component for comment threads
-- Created TaskAttachments component for file uploads
-- 5-column workflow: Backlog, To Do, In Progress, Review, Done
+### 🧠 Rationale
+- Simplified mental model: one user = one role
+- More granular permissions with scope (global/project/own/none)
+- 5 clearly defined roles: `superuser`, `project_manager`, `qa_manager`, `analyst`, `finance_incharge`
 
-#### Google Calendar Integration
-- Created calendar service (`src/services/google/calendar.ts`)
-- Implemented createMeeting with automatic Google Meet links
-- Created createMilestoneEvent for all-day milestone events
-- Created createDeadlineEvent for project deadlines
-- Created createTaskEvent for task due dates
-- Built MeetingScheduler component with attendee management
-- Built CalendarSync component for milestone/deadline sync
+### 🔄 Behavior / Compatibility Implications
+- **Breaking**: Users with multiple roles need migration to single role
+- **Breaking**: Permission checks now use `actions.includes(action)` not boolean flags
+- Project managers can only access their assigned projects
+
+### 🧪 Testing Recommendations
+- Verify role assignment in admin UI
+- Test permission boundaries for each role
+- Verify project-scoped access for project managers
+
+### 📌 Follow-ups
+- Migrate existing users to new role format
+- Update seed scripts for all environments
 
 ---
 
-## [0.3.0] - 2025-01-25
+## 0.4.1 - 2026-01-25 | 🚀 feat: Custom Fields System (Phase 7)
 
-### Added - Phase 3: Finance & Document Modules
+### 📄 Summary
+Added enterprise-grade custom fields system for tasks with dynamic field definitions.
 
-#### Expense Module
-- Created useExpenses hook with React Query (CRUD, filtering, stats, approval workflow)
-- Created expenses API service (`src/services/api/expenses.ts`)
-- Built ExpensesPage with filtering by status/category, stats cards
-- Created ExpenseCard component with action buttons
-- Created ExpenseModal for create/edit with receipt upload
-- Implemented expense workflow: draft → pending → approved/rejected → paid
-- Created ExpenseChart component with multiple chart types (category, status, monthly, trend)
-- Created BudgetSummary component for category breakdown
-- Created ReceiptUpload component
+### 📁 Files Changed
+- `src/types/customField.ts` - CustomFieldType, CustomFieldValue, CustomFieldDefinition
+- `src/types/task.ts` - Extended with TaskType, TaskCategory, 12 new fields
+- `src/services/api/customFields.ts` - CRUD operations
+- `src/hooks/useCustomFields.ts` - React Query hooks
+- `src/components/tasks/TaskModal.tsx` - Collapsible sections
+- `src/components/tasks/TaskCard.tsx` - Type/category badges
 
-#### Approval Module
-- Created useApprovals hook for approval workflow (pending queue, approve/reject, comments)
-- Created approvals API service (`src/services/api/approvals.ts`)
-- Built ApprovalsPage with tabs (Pending/All), filtering by status/type/priority
-- Created ApprovalCard component with approve/reject actions
-- Implemented approval with audit logging
+### 🧠 Rationale
+Enterprise customers need customizable task fields for their workflows.
 
-#### Reports Module
-- Built ReportsPage with date range selection and charts
-- Implemented export to Excel (xlsx)
-- Implemented export to PDF (jspdf)
-- Financial summaries and category breakdown
+### 🔄 Behavior / Compatibility Implications
+- Tasks now support additional metadata fields
+- Backward compatible - existing tasks work without custom fields
 
-#### Document Module
-- Created useDocuments hook (CRUD, folder navigation, versioning, sharing, search)
-- Created documents API service (`src/services/api/documents.ts`)
-- Built DocumentsPage with folder hierarchy, grid/list view toggle
-- Created DocumentCard component with preview, download, delete actions
-- Created DocumentUpload component with drag-drop support
-- Created DocumentViewer modal for previews
-- Implemented folder tree navigation with breadcrumbs
-- Implemented document versioning with notes
-- Implemented document sharing with access control
+### 🧪 Testing Recommendations
+- Create tasks with custom fields
+- Verify field persistence and display
 
-#### Google Drive Integration
-- Created drive service (`src/services/google/drive.ts`) framework
-- Created GoogleDrivePicker component
-- Created DriveSync component
-
----
-
-## [0.2.0] - 2025-01-25
-
-### Added - Phase 2: RBAC Management System
-
-#### Permission System
-- Created usePermissions hook with granular module/action permissions
-- Implemented hasPermission(module, action) function
-- Implemented canAccessProject(projectId) function
-- Implemented canAccessSensitiveData() function
-- Created isSuperAdmin, isFinanceManager, isProjectManager helpers
-- Created PermissionGuard component for permission-based access control
-- Created RoleGuard component for role-based access control
-
-#### User Management
-- Created useUsers hook with React Query (CRUD, role assignment, project assignment)
-- Created users API service (`src/services/api/users.ts`)
-- Built UsersPage with search, filtering by role/status
-- Created user list with pagination
-- Implemented role assignment interface
-- Implemented project assignment for managers
-- Implemented user status toggle (active/inactive)
-
-#### Role Management
-- Created useRoles hook (CRUD, permission management, data access settings)
-- Created roles API service (`src/services/api/roles.ts`)
-- Built RolesPage with role list and permission count display
-- Created permission matrix component
-- Implemented dataAccess settings (allProjects, sensitiveFinancials, globalAssets)
-- Protected system roles from deletion
-
-#### Audit Logging
-- Created useAuditLogs hook with infinite scroll and filtering
-- Created auditLogs API service (`src/services/api/auditLogs.ts`)
-- Built AuditLogsPage with expandable entries showing before/after changes
-- Implemented filtering by action type, user, date range
-- All CRUD operations log changes with before/after snapshots
-
----
-
-## Upcoming
-
-### [0.5.0] - Phase 5: Asset Management & Announcements
-- Asset tracking with QR codes
-- Maintenance scheduling
-- Rich text announcements
-- Targeting and read receipts
-- *(Types defined, implementation pending)*
-
-### [0.6.0] - Phase 7: Custom Fields System
-- Enterprise-grade custom fields for tasks
-- Dynamic field definitions (admin-configurable)
-- Field types: text, number, enum, multi_enum, date, person, checkbox, url
-- Project-scoped vs global fields
-- Extended Task properties (taskType, category, phase, sprint, goal, acceptanceCriteria, etc.)
+### 📌 Follow-ups
 - Admin UI for field management
+- Field validation rules
 
-### [1.0.0] - Phase 6: PWA, Presence, Testing & Deployment
-- Online presence system
-- Activity feed
-- Push notifications
-- Comprehensive testing (Vitest + Playwright)
-- CI/CD pipeline (GitHub Actions)
-- *(PWA config and CI/CD pipeline complete, tests pending)*
+---
+
+## 0.4.0 - 2025-01-25 | 🚀 feat: Project & Task Management (Phase 4)
+
+### 📄 Summary
+Project management with team collaboration and Kanban board with drag-drop.
+
+### 📁 Files Changed
+- `src/services/api/projects.ts`, `src/services/api/tasks.ts`
+- `src/hooks/useProjects.ts`, `src/hooks/useTasks.ts`
+- `src/pages/projects/*`, `src/pages/tasks/*`
+- `src/components/projects/*`, `src/components/tasks/*`
+
+### 🧠 Rationale
+Core project and task management functionality for team collaboration.
+
+### 🔄 Behavior / Compatibility Implications
+- Projects have team members with roles
+- Tasks flow through 5-column Kanban: Backlog → To Do → In Progress → Review → Done
+
+### 🧪 Testing Recommendations
+- Drag tasks between columns
+- Add/remove team members
+- Filter by status/priority
+
+### 📌 Follow-ups
+- Google Calendar integration for milestones
+
+---
+
+## 0.3.0 - 2025-01-25 | 🚀 feat: Finance & Document Modules (Phase 3)
+
+### 📄 Summary
+Expense management with approval workflow and document management with versioning.
+
+### 📁 Files Changed
+- `src/services/api/expenses.ts`, `src/services/api/documents.ts`
+- `src/hooks/useExpenses.ts`, `src/hooks/useDocuments.ts`
+- `src/pages/finance/*`, `src/pages/documents/*`
+
+### 🧠 Rationale
+Financial tracking and document collaboration for business operations.
+
+### 🔄 Behavior / Compatibility Implications
+- Expense workflow: draft → pending → approved/rejected → paid
+- Documents support versioning and sharing
+
+### 🧪 Testing Recommendations
+- Submit and approve expenses
+- Upload and version documents
+
+### 📌 Follow-ups
+- Excel/PDF export for reports
+
+---
+
+## 0.2.0 - 2025-01-25 | 🚀 feat: RBAC Management System (Phase 2)
+
+### 📄 Summary
+Role-based access control with permission management, user management, and audit logging.
+
+### 📁 Files Changed
+- `src/hooks/usePermissions.ts`, `src/hooks/useUsers.ts`, `src/hooks/useRoles.ts`
+- `src/services/api/users.ts`, `src/services/api/roles.ts`, `src/services/api/auditLogs.ts`
+- `src/pages/admin/*`
+
+### 🧠 Rationale
+Enterprise security requirements for granular access control.
+
+### 🔄 Behavior / Compatibility Implications
+- All CRUD operations logged to audit trail
+- Permission-based UI visibility
+
+### 🧪 Testing Recommendations
+- Assign roles and verify access
+- Check audit logs for changes
+
+### 📌 Follow-ups
+- Role inheritance (later)
+
+---
+
+## 0.1.0 - 2025-01-25 | 🚀 feat: Foundation & Firebase Setup (Phase 1)
+
+### 📄 Summary
+Project foundation with Firebase integration, authentication, and UI framework.
+
+### 📁 Files Changed
+- Initial project setup
+- Firebase config, Firestore rules
+- Auth context, protected routes
+- Base UI components, layouts
+
+### 🧠 Rationale
+Establish solid foundation for enterprise portal.
+
+### 🔄 Behavior / Compatibility Implications
+- Google OAuth authentication
+- PWA-enabled with offline support
+
+### 🧪 Testing Recommendations
+- Login flow with Google
+- Verify protected routes redirect
+
+### 📌 Follow-ups
+- Additional auth providers (later)

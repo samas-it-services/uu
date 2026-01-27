@@ -34,3 +34,12 @@ export interface Role {
 }
 
 export type Module = keyof RolePermissions;
+
+// Backward compatibility aliases
+export type Action = PermissionAction;
+
+export interface DataAccess {
+  allProjects: boolean;
+  sensitiveFinancials: boolean;
+  globalAssets: boolean;
+}

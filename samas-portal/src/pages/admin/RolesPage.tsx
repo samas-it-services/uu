@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { Shield, Plus, Edit2, Trash2 } from 'lucide-react';
-import { Role } from '@/types/role';
+import { Role, RolePermissions } from '@/types/role';
 import { useRoles, useCreateRole, useUpdateRole, useDeleteRole } from '@/hooks/useRoles';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Button } from '@/components/ui/Button';
@@ -44,8 +44,7 @@ export const RolesPage: FC = () => {
   const handleRoleSubmit = async (data: {
     name: string;
     description: string;
-    permissions: Role['permissions'];
-    dataAccess: Role['dataAccess'];
+    permissions: RolePermissions;
   }) => {
     if (selectedRole) {
       await updateRole.mutateAsync({
@@ -54,7 +53,6 @@ export const RolesPage: FC = () => {
           name: data.name,
           description: data.description,
           permissions: data.permissions,
-          dataAccess: data.dataAccess,
         },
       });
     } else {
@@ -62,7 +60,6 @@ export const RolesPage: FC = () => {
         name: data.name,
         description: data.description,
         permissions: data.permissions,
-        dataAccess: data.dataAccess,
         isSystem: false,
       });
     }
@@ -73,11 +70,24 @@ export const RolesPage: FC = () => {
   const getPermissionCount = (role: Role): number => {
     let count = 0;
     Object.values(role.permissions).forEach((module) => {
-      Object.values(module).forEach((enabled) => {
-        if (enabled) count++;
-      });
+      if (module?.actions) {
+        count += module.actions.length;
+      }
     });
     return count;
+  };
+
+  const getScopeLabel = (role: Role): string => {
+    const scopes = new Set<string>();
+    Object.values(role.permissions).forEach((module) => {
+      if (module?.scope && module.scope !== 'none') {
+        scopes.add(module.scope);
+      }
+    });
+    if (scopes.has('global')) return 'Global';
+    if (scopes.has('project')) return 'Project';
+    if (scopes.has('own')) return 'Own';
+    return 'No access';
   };
 
   const canCreate = hasPermission('rbac', 'create');
@@ -144,21 +154,9 @@ export const RolesPage: FC = () => {
                     <Badge variant="outline">{getPermissionCount(role)} enabled</Badge>
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {role.dataAccess.allProjects && (
-                      <Badge variant="outline" className="text-xs">
-                        All Projects
-                      </Badge>
-                    )}
-                    {role.dataAccess.sensitiveFinancials && (
-                      <Badge variant="outline" className="text-xs">
-                        Financials
-                      </Badge>
-                    )}
-                    {role.dataAccess.globalAssets && (
-                      <Badge variant="outline" className="text-xs">
-                        Global Assets
-                      </Badge>
-                    )}
+                    <Badge variant="outline" className="text-xs">
+                      {getScopeLabel(role)} Scope
+                    </Badge>
                   </div>
                   <div className="flex items-center gap-2 pt-3 border-t">
                     {canUpdate && (

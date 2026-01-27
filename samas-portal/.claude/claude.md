@@ -135,3 +135,27 @@ Per rule #3, always:
 1. Update CHANGELOG.md
 2. Run tests: `npm test`
 3. Update relevant agent file in docs/agents/
+
+# **Changelog**
+
+All notable changes to this project will be documented in this file.
+The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Format
+- **Reverse chronological order** (newest at top)
+- **Header format:** `<semantic version> - YYYY-MM-DD | <category>: <title>`
+- **Categories:**
+  - 🚀 **feat**
+  - 🐛 **fix**
+  - 📘 **docs**
+  - 🧹 **chore**
+- **Sections included in every entry:**
+  - 📄 **Summary**
+  - 📁 **Files Changed**
+  - 🧠 **Rationale**
+  - 🔄 **Behavior / Compatibility Implications**
+  - 🧪 **Testing Recommendations**
+  - 📌 **Follow‑ups**
+
+---

@@ -181,7 +181,46 @@ export const useAssignUserRole = () => {
       await usersApi.assignRole(id, roleId as import('@/types/user').UserRole);
       if (currentUser && existingUser) {
         await createAuditLog({
-          action: 'user.role_assigned',
+          action: 'user.roles_assigned',
+          entityType: 'user',
+          entityId: id,
+          entityName: existingUser.displayName,
+          performedBy: {
+            id: currentUser.id,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+          },
+          changes: {
+            before: { role: existingUser.role },
+            after: { role: roleId },
+          },
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
+      success('Role assigned successfully');
+    },
+    onError: (err) => {
+      error(`Failed to assign role: ${err.message}`);
+    },
+  });
+};
+
+export const useAssignUserRoles = () => {
+  const queryClient = useQueryClient();
+  const { success, error } = useToast();
+  const { user: currentUser } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ id, roleIds }: { id: string; roleIds: string[] }) => {
+      const existingUser = await usersApi.getById(id);
+      // Single role system - take the first role from the array
+      const roleId = roleIds[0] || 'analyst';
+      await usersApi.assignRole(id, roleId as import('@/types/user').UserRole);
+      if (currentUser && existingUser) {
+        await createAuditLog({
+          action: 'user.roles_assigned',
           entityType: 'user',
           entityId: id,
           entityName: existingUser.displayName,

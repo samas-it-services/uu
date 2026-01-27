@@ -1,13 +1,12 @@
 import { FC } from 'react';
-import { RolePermissions, DataAccess, Module, Action } from '@/types/role';
+import { RolePermissions, Module, PermissionAction, PermissionScope, Permission } from '@/types/role';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { cn } from '@/lib/utils';
 
 interface PermissionMatrixProps {
   permissions: RolePermissions;
-  dataAccess: DataAccess;
   onPermissionsChange: (permissions: RolePermissions) => void;
-  onDataAccessChange: (dataAccess: DataAccess) => void;
   disabled?: boolean;
 }
 
@@ -21,84 +20,95 @@ const MODULES: { key: Module; label: string }[] = [
   { key: 'rbac', label: 'User Management' },
 ];
 
-const ACTIONS: { key: Action; label: string }[] = [
+const ACTIONS: { key: PermissionAction; label: string }[] = [
   { key: 'create', label: 'Create' },
   { key: 'read', label: 'Read' },
   { key: 'update', label: 'Update' },
   { key: 'delete', label: 'Delete' },
 ];
 
-const DATA_ACCESS_OPTIONS: { key: keyof DataAccess; label: string; description: string }[] = [
-  {
-    key: 'allProjects',
-    label: 'All Projects',
-    description: 'Access to view all projects regardless of membership',
-  },
-  {
-    key: 'sensitiveFinancials',
-    label: 'Sensitive Financials',
-    description: 'Access to sensitive financial data and reports',
-  },
-  {
-    key: 'globalAssets',
-    label: 'Global Assets',
-    description: 'Access to company-wide assets',
-  },
+const SCOPES: { key: PermissionScope; label: string }[] = [
+  { key: 'global', label: 'Global' },
+  { key: 'project', label: 'Project' },
+  { key: 'own', label: 'Own' },
+  { key: 'none', label: 'None' },
 ];
 
 export const PermissionMatrix: FC<PermissionMatrixProps> = ({
   permissions,
-  dataAccess,
   onPermissionsChange,
-  onDataAccessChange,
   disabled = false,
 }) => {
-  const handlePermissionToggle = (module: Module, action: Action) => {
+  const hasAction = (module: Module, action: PermissionAction): boolean => {
+    return permissions[module]?.actions?.includes(action) ?? false;
+  };
+
+  const handlePermissionToggle = (module: Module, action: PermissionAction) => {
     if (disabled) return;
-    const newPermissions = {
+    const currentActions = permissions[module]?.actions ?? [];
+    const newActions = currentActions.includes(action)
+      ? currentActions.filter((a) => a !== action)
+      : [...currentActions, action];
+
+    // If no actions left, set scope to 'none'
+    const newScope = newActions.length === 0 ? 'none' : permissions[module]?.scope ?? 'project';
+
+    const newPermissions: RolePermissions = {
       ...permissions,
       [module]: {
-        ...permissions[module],
-        [action]: !permissions[module][action],
+        actions: newActions,
+        scope: newScope,
       },
     };
     onPermissionsChange(newPermissions);
   };
 
-  const handleDataAccessToggle = (key: keyof DataAccess) => {
+  const handleScopeChange = (module: Module, scope: PermissionScope) => {
     if (disabled) return;
-    const newDataAccess = {
-      ...dataAccess,
-      [key]: !dataAccess[key],
-    };
-    onDataAccessChange(newDataAccess);
-  };
-
-  const handleModuleSelectAll = (module: Module) => {
-    if (disabled) return;
-    const allEnabled = ACTIONS.every((action) => permissions[module][action.key]);
-    const newPermissions = {
+    const newPermissions: RolePermissions = {
       ...permissions,
-      [module]: ACTIONS.reduce(
-        (acc, action) => ({
-          ...acc,
-          [action.key]: !allEnabled,
-        }),
-        {} as RolePermissions[Module]
-      ),
+      [module]: {
+        ...permissions[module],
+        scope,
+      },
     };
     onPermissionsChange(newPermissions);
   };
 
-  const handleActionSelectAll = (action: Action) => {
+  const handleModuleSelectAll = (module: Module) => {
     if (disabled) return;
-    const allEnabled = MODULES.every((module) => permissions[module.key][action]);
+    const allEnabled = ACTIONS.every((action) => hasAction(module, action.key));
+    const newActions: PermissionAction[] = allEnabled ? [] : ACTIONS.map((a) => a.key);
+    const newScope = newActions.length === 0 ? 'none' : permissions[module]?.scope ?? 'project';
+
+    const newPermissions: RolePermissions = {
+      ...permissions,
+      [module]: {
+        actions: newActions,
+        scope: newScope,
+      },
+    };
+    onPermissionsChange(newPermissions);
+  };
+
+  const handleActionSelectAll = (action: PermissionAction) => {
+    if (disabled) return;
+    const allEnabled = MODULES.every((module) => hasAction(module.key, action));
     const newPermissions = { ...permissions };
+
     MODULES.forEach((module) => {
+      const currentActions = newPermissions[module.key]?.actions ?? [];
+      const newActions = allEnabled
+        ? currentActions.filter((a) => a !== action)
+        : currentActions.includes(action)
+          ? currentActions
+          : [...currentActions, action];
+      const newScope = newActions.length === 0 ? 'none' : newPermissions[module.key]?.scope ?? 'project';
+
       newPermissions[module.key] = {
-        ...newPermissions[module.key],
-        [action]: !allEnabled,
-      };
+        actions: newActions,
+        scope: newScope,
+      } as Permission;
     });
     onPermissionsChange(newPermissions);
   };
@@ -124,6 +134,7 @@ export const PermissionMatrix: FC<PermissionMatrixProps> = ({
                     </button>
                   </th>
                 ))}
+                <th className="text-center p-3 text-sm font-medium">Scope</th>
               </tr>
             </thead>
             <tbody>
@@ -145,39 +156,34 @@ export const PermissionMatrix: FC<PermissionMatrixProps> = ({
                   {ACTIONS.map((action) => (
                     <td key={action.key} className="text-center p-3">
                       <Checkbox
-                        checked={permissions[module.key][action.key]}
+                        checked={hasAction(module.key, action.key)}
                         onCheckedChange={() => handlePermissionToggle(module.key, action.key)}
                         disabled={disabled}
                       />
                     </td>
                   ))}
+                  <td className="text-center p-3">
+                    <Select
+                      value={permissions[module.key]?.scope ?? 'none'}
+                      onValueChange={(value) => handleScopeChange(module.key, value as PermissionScope)}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger className="w-24 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SCOPES.map((scope) => (
+                          <SelectItem key={scope.key} value={scope.key}>
+                            {scope.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-semibold mb-3">Data Access</h3>
-        <div className="space-y-3">
-          {DATA_ACCESS_OPTIONS.map((option) => (
-            <div
-              key={option.key}
-              className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-accent/50 cursor-pointer"
-              onClick={() => handleDataAccessToggle(option.key)}
-            >
-              <Checkbox
-                checked={dataAccess[option.key]}
-                onCheckedChange={() => handleDataAccessToggle(option.key)}
-                disabled={disabled}
-              />
-              <div>
-                <span className="font-medium text-sm">{option.label}</span>
-                <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>

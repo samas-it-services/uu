@@ -79,7 +79,7 @@ export const UsersPage: FC = () => {
         email: data.email,
         displayName: data.displayName,
         photoURL: data.photoURL,
-        roles: [],
+        role: 'analyst',
         isActive: data.isActive,
       });
     }
@@ -157,7 +157,7 @@ export const UsersPage: FC = () => {
               onEdit={handleEditUser}
               onDelete={handleDeleteUser}
               onToggleStatus={handleToggleStatus}
-              onAssignRoles={handleAssignRoles}
+              onAssignRole={handleAssignRoles}
             />
           ))}
         </div>

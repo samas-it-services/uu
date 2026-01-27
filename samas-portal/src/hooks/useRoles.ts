@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { rolesApi, CreateRoleData, UpdateRoleData } from '@/services/api/roles';
-import { RolePermissions, DataAccess } from '@/types/role';
+import { RolePermissions } from '@/types/role';
 import { useToast } from '@/hooks/useToast';
 import { createAuditLog } from '@/utils/auditLog';
 import { useAuth } from '@/hooks/useAuth';
@@ -178,20 +178,3 @@ export const useUpdateRolePermissions = () => {
   });
 };
 
-export const useUpdateRoleDataAccess = () => {
-  const queryClient = useQueryClient();
-  const { success, error } = useToast();
-
-  return useMutation({
-    mutationFn: async ({ id, dataAccess }: { id: string; dataAccess: DataAccess }) => {
-      await rolesApi.updateDataAccess(id, dataAccess);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ROLES_QUERY_KEY] });
-      success('Data access updated successfully');
-    },
-    onError: (err) => {
-      error(`Failed to update data access: ${err.message}`);
-    },
-  });
-};
