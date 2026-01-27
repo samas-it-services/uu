@@ -17,6 +17,10 @@ build
 .env.*.local
 .env.staging
 
+# Test environment (may contain sensitive overrides)
+.env.test.local
+# Note: .env.test is tracked for CI (contains only emulator config, no secrets)
+
 # Firebase service accounts and credentials
 *-firebase-adminsdk-*.json
 serviceAccountKey.json
@@ -35,6 +39,8 @@ google-services.json
 coverage
 playwright-report
 test-results
+tests/e2e/.auth/
+emulator-data/
 
 # Firebase
 .firebase

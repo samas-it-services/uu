@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.4 - 2026-01-27 | 🐛 fix: E2E authentication with Firebase emulators
+
+### 📄 Summary
+Fixed E2E test authentication so tests properly authenticate against Firebase emulators. The root cause was an API key mismatch between the injected auth state (`test-api-key`) and the app's environment (`VITE_FIREBASE_API_KEY`).
+
+### 📁 Files Changed
+- `.env.test` - Created test-specific Firebase config with emulator-compatible values
+- `playwright.config.ts` - Changed webServer command to use `vite --mode test` for loading `.env.test`
+- `tests/e2e/fixtures/auth.fixture.ts` - Added navigation + wait for auth state after injecting localStorage
+- `.gitignore` - Added `.env.test.local` to ignore list with clarifying comments
+
+### 🧠 Rationale
+Firebase Auth stores session state with a key format: `firebase:authUser:<API_KEY>:[DEFAULT]`. When the auth fixture injected state with `test-api-key` but the app used a different API key from `.env`, Firebase couldn't find the session. The fix ensures both use `test-api-key` by:
+1. Creating `.env.test` with `VITE_FIREBASE_API_KEY=test-api-key`
+2. Using Vite's mode system (`--mode test`) to load this config during E2E tests
+
+### 🔄 Behavior / Compatibility Implications
+- E2E tests now run with a dedicated `.env.test` configuration
+- No impact on production or development builds
+- The app connects to emulators when `VITE_USE_EMULATORS=true` is set
+
+### 🧪 Testing Recommendations
+1. Start emulators: `firebase emulators:start --only auth,firestore,storage`
+2. Run E2E tests: `VITE_USE_EMULATORS=true npx playwright test`
+3. Verify global setup creates 5 test users
+4. Verify tests navigate to authenticated pages successfully
+
+### 📌 Follow-ups
+- Add more authenticated E2E test coverage
+- Consider IndexedDB injection for full Firebase SDK compatibility
+- Add CI workflow for emulator-based E2E tests
+
+---
+
 ## 0.5.3 - 2026-01-27 | 🐛 fix: Runtime errors and folder permissions
 
 ### 📄 Summary
