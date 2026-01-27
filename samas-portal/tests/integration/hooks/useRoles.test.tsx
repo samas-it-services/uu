@@ -1,5 +1,6 @@
 /**
  * useRoles Hook Integration Tests
+ * Updated for new RBAC system (v0.5.0)
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -8,7 +9,7 @@ import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useRoles, useRole, useSystemRoles, useCustomRoles } from '@/hooks/useRoles';
-import { createMockSuperAdmin } from '@/test-utils/factories/user.factory';
+import { createMockSuperuser } from '@/test-utils/factories/user.factory';
 import {
   createMockSuperAdminRole,
   createMockFinanceManagerRole,
@@ -53,7 +54,6 @@ vi.mock('@/services/api/roles', () => ({
     update: vi.fn(() => Promise.resolve()),
     delete: vi.fn(() => Promise.resolve()),
     updatePermissions: vi.fn(() => Promise.resolve()),
-    updateDataAccess: vi.fn(() => Promise.resolve()),
   },
 }));
 
@@ -62,13 +62,16 @@ const createWrapper = (user: User | null = null, roles: Role[] = []) => {
     defaultOptions: { queries: { retry: false } },
   });
 
+  // AuthContext uses `userRole` (singular Role) not `roles` (array)
+  const userRole = roles.length > 0 ? roles[0] : null;
+
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider
         value={{
           user,
           firebaseUser: user ? { uid: user.id } : null,
-          roles,
+          userRole,
           loading: false,
           signInWithGoogle: vi.fn(),
           signOut: vi.fn(),
@@ -100,7 +103,7 @@ describe('useRoles', () => {
       vi.mocked(rolesApi.getAll).mockResolvedValue(mockRoles);
 
       const { result } = renderHook(() => useRoles(), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
@@ -108,7 +111,8 @@ describe('useRoles', () => {
       });
 
       expect(result.current.data).toHaveLength(4);
-      expect(result.current.data?.[0].name).toBe('Super Admin');
+      // New RBAC: Super Admin role is now named "Super User"
+      expect(result.current.data?.[0].name).toBe('Super User');
       expect(rolesApi.getAll).toHaveBeenCalled();
     });
 
@@ -117,7 +121,7 @@ describe('useRoles', () => {
       vi.mocked(rolesApi.getAll).mockResolvedValue([]);
 
       const { result } = renderHook(() => useRoles(), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
@@ -135,8 +139,8 @@ describe('useRoles', () => {
       const { rolesApi } = await import('@/services/api/roles');
       vi.mocked(rolesApi.getById).mockResolvedValue(mockRole);
 
-      const { result } = renderHook(() => useRole('super_admin'), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+      const { result } = renderHook(() => useRole('superuser'), {
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
@@ -144,15 +148,16 @@ describe('useRoles', () => {
       });
 
       expect(result.current.data).toEqual(mockRole);
-      expect(result.current.data?.name).toBe('Super Admin');
-      expect(rolesApi.getById).toHaveBeenCalledWith('super_admin');
+      // New RBAC: Role is named "Super User"
+      expect(result.current.data?.name).toBe('Super User');
+      expect(rolesApi.getById).toHaveBeenCalledWith('superuser');
     });
 
     it('should not fetch when ID is empty', async () => {
       const { rolesApi } = await import('@/services/api/roles');
 
       const { result } = renderHook(() => useRole(''), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       expect(result.current.isFetching).toBe(false);
@@ -173,7 +178,7 @@ describe('useRoles', () => {
       vi.mocked(rolesApi.getSystemRoles).mockResolvedValue(systemRoles);
 
       const { result } = renderHook(() => useSystemRoles(), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
@@ -191,7 +196,7 @@ describe('useRoles', () => {
       vi.mocked(rolesApi.getCustomRoles).mockResolvedValue([]);
 
       const { result } = renderHook(() => useCustomRoles(), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
@@ -203,82 +208,79 @@ describe('useRoles', () => {
     });
   });
 
-  describe('Role Permissions', () => {
-    it('should include correct permissions for super admin role', async () => {
+  describe('Role Permissions (New RBAC Structure)', () => {
+    it('should include correct permissions for super user role', async () => {
       const mockRole = createMockSuperAdminRole();
 
       const { rolesApi } = await import('@/services/api/roles');
       vi.mocked(rolesApi.getById).mockResolvedValue(mockRole);
 
-      const { result } = renderHook(() => useRole('super_admin'), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+      const { result } = renderHook(() => useRole('superuser'), {
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      // Super admin should have all permissions (permissions are objects with boolean values)
-      expect(result.current.data?.permissions.finance).toEqual({ create: true, read: true, update: true, delete: true });
-      expect(result.current.data?.permissions.projects).toEqual({ create: true, read: true, update: true, delete: true });
-      expect(result.current.data?.permissions.rbac).toEqual({ create: true, read: true, update: true, delete: true });
+      // New RBAC: Permissions use actions array with scope
+      expect(result.current.data?.permissions.finance.actions).toContain('create');
+      expect(result.current.data?.permissions.finance.actions).toContain('read');
+      expect(result.current.data?.permissions.finance.actions).toContain('update');
+      expect(result.current.data?.permissions.finance.actions).toContain('delete');
+      expect(result.current.data?.permissions.finance.scope).toBe('global');
+
+      expect(result.current.data?.permissions.rbac.actions).toContain('create');
+      expect(result.current.data?.permissions.rbac.scope).toBe('global');
     });
 
-    it('should include correct permissions for finance manager role', async () => {
+    it('should include correct permissions for finance incharge role', async () => {
       const mockRole = createMockFinanceManagerRole();
 
       const { rolesApi } = await import('@/services/api/roles');
       vi.mocked(rolesApi.getById).mockResolvedValue(mockRole);
 
-      const { result } = renderHook(() => useRole('finance_manager'), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+      const { result } = renderHook(() => useRole('finance_incharge'), {
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      // Finance manager has finance permissions but not RBAC
-      expect(result.current.data?.permissions.finance).toEqual({ create: true, read: true, update: true, delete: true });
-      expect(result.current.data?.permissions.rbac).toEqual({ create: false, read: false, update: false, delete: false });
+      // Finance incharge has full finance permissions with global scope
+      expect(result.current.data?.permissions.finance.actions).toContain('create');
+      expect(result.current.data?.permissions.finance.actions).toContain('delete');
+      expect(result.current.data?.permissions.finance.scope).toBe('global');
+
+      // Finance incharge has no RBAC access
+      expect(result.current.data?.permissions.rbac.actions).toHaveLength(0);
+      expect(result.current.data?.permissions.rbac.scope).toBe('none');
     });
 
-    it('should include correct data access for finance manager role', async () => {
-      const mockRole = createMockFinanceManagerRole();
-
-      const { rolesApi } = await import('@/services/api/roles');
-      vi.mocked(rolesApi.getById).mockResolvedValue(mockRole);
-
-      const { result } = renderHook(() => useRole('finance_manager'), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
-      });
-
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
-
-      // Finance manager should have sensitive financial data access
-      expect(result.current.data?.dataAccess.sensitiveFinancials).toBe(true);
-      expect(result.current.data?.dataAccess.allProjects).toBe(true);
-    });
-
-    it('should restrict project manager data access', async () => {
+    it('should restrict project manager permissions to project scope', async () => {
       const mockRole = createMockProjectManagerRole();
 
       const { rolesApi } = await import('@/services/api/roles');
       vi.mocked(rolesApi.getById).mockResolvedValue(mockRole);
 
       const { result } = renderHook(() => useRole('project_manager'), {
-        wrapper: createWrapper(createMockSuperAdmin(), []),
+        wrapper: createWrapper(createMockSuperuser(), []),
       });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      // Project manager should NOT have sensitive data access
-      expect(result.current.data?.dataAccess.sensitiveFinancials).toBe(false);
-      expect(result.current.data?.dataAccess.allProjects).toBe(false);
+      // Project manager has finance read-only at project scope
+      expect(result.current.data?.permissions.finance.actions).toContain('read');
+      expect(result.current.data?.permissions.finance.actions).not.toContain('delete');
+      expect(result.current.data?.permissions.finance.scope).toBe('project');
+
+      // Project manager has full task permissions at project scope
+      expect(result.current.data?.permissions.tasks.actions).toContain('create');
+      expect(result.current.data?.permissions.tasks.actions).toContain('delete');
+      expect(result.current.data?.permissions.tasks.scope).toBe('project');
     });
   });
 });

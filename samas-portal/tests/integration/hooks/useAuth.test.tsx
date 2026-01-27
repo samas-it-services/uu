@@ -1,5 +1,6 @@
 /**
  * useAuth Hook Integration Tests
+ * Updated for new RBAC system (v0.5.0)
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -8,7 +9,7 @@ import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
-import { createMockUser, createMockSuperAdmin } from '@/test-utils/factories/user.factory';
+import { createMockUser, createMockSuperuser, createMockAnalyst } from '@/test-utils/factories/user.factory';
 import { createMockSuperAdminRole, createMockEmployeeRole } from '@/test-utils/factories/role.factory';
 import { User } from '@/types/user';
 import { Role } from '@/types/role';
@@ -34,6 +35,9 @@ const createMockAuthProvider = (
   roles: Role[] = [],
   loading = false
 ) => {
+  // AuthContext uses `userRole` (singular Role) not `roles` (array)
+  const userRole = roles.length > 0 ? roles[0] : null;
+
   const MockAuthProvider = ({ children }: MockAuthProviderProps) => {
     const mockContextValue = {
       user,
@@ -44,7 +48,7 @@ const createMockAuthProvider = (
             displayName: user.displayName,
           }
         : null,
-      roles,
+      userRole,
       loading,
       signInWithGoogle: vi.fn(),
       signOut: vi.fn(),
@@ -103,7 +107,7 @@ describe('useAuth', () => {
 
       expect(result.current.loading).toBe(false);
       expect(result.current.user).toBeNull();
-      expect(result.current.roles).toEqual([]);
+      expect(result.current.userRole).toBeNull();
     });
   });
 
@@ -120,20 +124,22 @@ describe('useAuth', () => {
       expect(result.current.user?.email).toBe('test@example.com');
     });
 
-    it('should return roles for authenticated user', () => {
-      const mockUser = createMockSuperAdmin();
+    it('should return userRole for authenticated user', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createWrapper(mockUser, mockRoles, false),
       });
 
-      expect(result.current.roles).toHaveLength(1);
-      expect(result.current.roles[0].name).toBe('Super Admin');
+      expect(result.current.userRole).not.toBeNull();
+      // New RBAC: Role is named "Super User"
+      expect(result.current.userRole?.name).toBe('Super User');
     });
 
-    it('should identify super admin by email', () => {
-      const mockUser = createMockUser({ email: 'bill@samas.tech', roles: ['super_admin'] });
+    it('should identify super user by email', () => {
+      // New RBAC: User has single role, not roles array
+      const mockUser = createMockUser({ email: 'bill@samas.tech', role: 'superuser' });
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => useAuth(), {
@@ -141,7 +147,8 @@ describe('useAuth', () => {
       });
 
       expect(result.current.user?.email).toBe('bill@samas.tech');
-      expect(result.current.user?.roles).toContain('super_admin');
+      // New RBAC: user.role is a string, not user.roles array
+      expect(result.current.user?.role).toBe('superuser');
     });
 
     it('should have signInWithGoogle and signOut functions', () => {
@@ -154,57 +161,60 @@ describe('useAuth', () => {
     });
   });
 
-  describe('User Roles', () => {
-    it('should support employee role', () => {
-      const mockUser = createMockUser({ roles: ['employee'] });
+  describe('User Roles (New RBAC Structure)', () => {
+    it('should support analyst role', () => {
+      // New RBAC: User has single role
+      const mockUser = createMockUser({ role: 'analyst' });
       const mockRoles = [createMockEmployeeRole()];
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createWrapper(mockUser, mockRoles, false),
       });
 
-      expect(result.current.user?.roles).toContain('employee');
-      expect(result.current.roles[0].id).toBe('employee');
+      expect(result.current.user?.role).toBe('analyst');
+      expect(result.current.userRole?.id).toBe('analyst');
     });
 
-    it('should support multiple roles', () => {
-      const mockUser = createMockUser({ roles: ['employee', 'project_manager'] });
-      const mockRoles = [createMockEmployeeRole()];
+    it('should have single role per user', () => {
+      // New RBAC: Users have exactly one role, not multiple
+      const mockUser = createMockUser({ role: 'project_manager' });
 
       const { result } = renderHook(() => useAuth(), {
-        wrapper: createWrapper(mockUser, mockRoles, false),
+        wrapper: createWrapper(mockUser, [], false),
       });
 
-      expect(result.current.user?.roles).toContain('employee');
-      expect(result.current.user?.roles).toContain('project_manager');
+      expect(result.current.user?.role).toBe('project_manager');
+      // Verify it's a string, not an array
+      expect(typeof result.current.user?.role).toBe('string');
     });
   });
 
-  describe('Project Access', () => {
-    it('should track managed projects for project manager', () => {
+  describe('Project Access (New RBAC Structure)', () => {
+    it('should track projects for project manager', () => {
+      // New RBAC: User has `projects` array (unified, not separate managed/member)
       const mockUser = createMockUser({
-        roles: ['project_manager'],
-        managedProjects: ['project-1', 'project-2'],
+        role: 'project_manager',
+        projects: ['project-1', 'project-2'],
       });
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createWrapper(mockUser, [], false),
       });
 
-      expect(result.current.user?.managedProjects).toEqual(['project-1', 'project-2']);
+      expect(result.current.user?.projects).toEqual(['project-1', 'project-2']);
     });
 
-    it('should track member projects for employee', () => {
-      const mockUser = createMockUser({
-        roles: ['employee'],
-        memberProjects: ['project-1'],
+    it('should track projects for analyst', () => {
+      // New RBAC: User has `projects` array
+      const mockUser = createMockAnalyst({
+        projects: ['project-1'],
       });
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createWrapper(mockUser, [], false),
       });
 
-      expect(result.current.user?.memberProjects).toEqual(['project-1']);
+      expect(result.current.user?.projects).toEqual(['project-1']);
     });
   });
 });

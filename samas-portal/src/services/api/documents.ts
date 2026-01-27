@@ -144,7 +144,7 @@ export const documentsApi = {
     data: CreateDocumentData
   ): Promise<string> {
     const now = Timestamp.now();
-    const storagePath = `documents/${data.projectId || 'general'}/${Date.now()}-${file.name}`;
+    const storagePath = `documents/${data.projectId || 'general'}/${Date.now()}/${file.name}`;
     const storageRef = ref(storage, storagePath);
 
     await uploadBytes(storageRef, file);
@@ -194,7 +194,7 @@ export const documentsApi = {
     if (!document) throw new Error('Document not found');
 
     const now = Timestamp.now();
-    const storagePath = `documents/${document.projectId || 'general'}/${Date.now()}-${file.name}`;
+    const storagePath = `documents/${document.projectId || 'general'}/${Date.now()}/${file.name}`;
     const storageRef = ref(storage, storagePath);
 
     await uploadBytes(storageRef, file);

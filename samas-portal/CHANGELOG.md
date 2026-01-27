@@ -11,6 +11,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.2 - 2026-01-26 | 🐛 fix: Storage upload permissions and RBAC test failures
+
+### 📄 Summary
+Fixed two critical issues: (1) Document uploads failing with permission errors due to storage path mismatch, and (2) Integration tests failing due to RBAC structure changes not reflected in test files.
+
+### 📁 Files Changed
+- `src/services/api/documents.ts` - Fixed storage path to match rules (3 segments instead of 2)
+- `tests/integration/hooks/useRoles.test.tsx` - Updated for new RBAC structure (userRole, permission format)
+- `tests/integration/hooks/useAuth.test.tsx` - Changed from `roles[]` to `userRole`, updated expectations
+- `tests/integration/hooks/usePermissions.test.tsx` - Fixed context wrapper and permission checks
+- `cors.json` - Created CORS configuration for Firebase Storage (custom domain support)
+
+### 🧠 Rationale
+1. **Storage path mismatch**: Code generated `documents/{category}/{timestamp}-{filename}` (2 segments) but `storage.rules` expected `documents/{category}/{documentId}/{fileName}` (3 segments), causing permission denied errors.
+2. **Test failures**: Tests still used old RBAC structure (`roles[]` array, boolean permission flags) while codebase was updated to new structure (`userRole` singular, `{ actions[], scope }` permissions).
+
+### 🔄 Behavior / Compatibility Implications
+- Document uploads now work from custom domain (uu.samas.tech)
+- Storage paths changed from `documents/general/123-file.csv` to `documents/general/123/file.csv`
+- CORS configured for localhost:5173, localhost:5174, and uu.samas.tech
+
+### 🧪 Testing Recommendations
+- Run `npm test` - all 89 tests should pass
+- Run `npm run lint` - should pass with 0 warnings
+- Test document upload at https://uu.samas.tech/documents
+
+### 📌 Follow-ups
+- Add integration tests for document upload (`useDocuments.test.tsx`)
+- Implement skipped E2E tests for receipt upload in `expenses.spec.ts`
+
+---
+
 ## 0.5.1 - 2026-01-26 | 🐛 fix: RBAC permission type system build failures
 
 ### 📄 Summary

@@ -1,5 +1,6 @@
 /**
  * usePermissions Hook Integration Tests
+ * Updated for new RBAC system (v0.5.0)
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -10,10 +11,10 @@ import { AuthContext } from '@/contexts/AuthContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import {
   createMockUser,
-  createMockSuperAdmin,
-  createMockFinanceManager,
+  createMockSuperuser,
+  createMockFinanceIncharge,
   createMockProjectManager,
-  createMockEmployee,
+  createMockAnalyst,
 } from '@/test-utils/factories/user.factory';
 import {
   createMockSuperAdminRole,
@@ -38,13 +39,16 @@ const createWrapper = (user: User | null = null, roles: Role[] = []) => {
     defaultOptions: { queries: { retry: false } },
   });
 
+  // AuthContext uses `userRole` (singular Role) not `roles` (array)
+  const userRole = roles.length > 0 ? roles[0] : null;
+
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider
         value={{
           user,
           firebaseUser: user ? { uid: user.id } : null,
-          roles,
+          userRole,
           loading: false,
           signInWithGoogle: vi.fn(),
           signOut: vi.fn(),
@@ -64,7 +68,7 @@ describe('usePermissions', () => {
   });
 
   describe('Role Identification', () => {
-    it('should identify super admin by email', () => {
+    it('should identify super user by email', () => {
       const mockUser = createMockUser({ email: 'bill@samas.tech' });
 
       const { result } = renderHook(() => usePermissions(), {
@@ -74,8 +78,8 @@ describe('usePermissions', () => {
       expect(result.current.isSuperAdmin).toBe(true);
     });
 
-    it('should identify super admin by role', () => {
-      const mockUser = createMockSuperAdmin();
+    it('should identify super user by role', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -85,8 +89,8 @@ describe('usePermissions', () => {
       expect(result.current.isSuperAdmin).toBe(true);
     });
 
-    it('should identify finance manager', () => {
-      const mockUser = createMockFinanceManager();
+    it('should identify finance incharge', () => {
+      const mockUser = createMockFinanceIncharge();
       const mockRoles = [createMockFinanceManagerRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -121,9 +125,9 @@ describe('usePermissions', () => {
     });
   });
 
-  describe('hasPermission', () => {
-    it('should return true for super admin on any permission', () => {
-      const mockUser = createMockSuperAdmin();
+  describe('hasPermission (New RBAC Structure)', () => {
+    it('should return true for super user on any permission', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -137,50 +141,54 @@ describe('usePermissions', () => {
       expect(result.current.hasPermission('rbac', 'delete')).toBe(true);
     });
 
-    it('should check role permissions for finance manager', () => {
-      const mockUser = createMockFinanceManager();
+    it('should check role permissions for finance incharge', () => {
+      const mockUser = createMockFinanceIncharge();
       const mockRoles = [createMockFinanceManagerRole()];
 
       const { result } = renderHook(() => usePermissions(), {
         wrapper: createWrapper(mockUser, mockRoles),
       });
 
-      // Finance manager has full finance permissions
+      // Finance incharge has full finance permissions
       expect(result.current.hasPermission('finance', 'create')).toBe(true);
       expect(result.current.hasPermission('finance', 'read')).toBe(true);
       expect(result.current.hasPermission('finance', 'update')).toBe(true);
 
-      // Finance manager has read-only on projects
+      // Finance incharge has read-only on projects (global scope)
       expect(result.current.hasPermission('projects', 'read')).toBe(true);
+      // Note: Finance incharge doesn't have create for projects
       expect(result.current.hasPermission('projects', 'create')).toBe(false);
 
-      // Finance manager cannot access RBAC
+      // Finance incharge cannot access RBAC
       expect(result.current.hasPermission('rbac', 'read')).toBe(false);
     });
 
-    it('should check role permissions for employee', () => {
-      const mockUser = createMockEmployee();
+    it('should check role permissions for analyst', () => {
+      const mockUser = createMockAnalyst();
       const mockRoles = [createMockEmployeeRole()];
 
       const { result } = renderHook(() => usePermissions(), {
         wrapper: createWrapper(mockUser, mockRoles),
       });
 
-      // Employee can read and create expenses
-      expect(result.current.hasPermission('finance', 'read')).toBe(true);
-      expect(result.current.hasPermission('finance', 'create')).toBe(true);
+      // Analyst has no finance permissions (scope: none)
+      expect(result.current.hasPermission('finance', 'read')).toBe(false);
+      expect(result.current.hasPermission('finance', 'create')).toBe(false);
 
-      // Employee cannot delete finance
-      expect(result.current.hasPermission('finance', 'delete')).toBe(false);
+      // Analyst can read projects (project scope)
+      expect(result.current.hasPermission('projects', 'read')).toBe(true);
 
-      // Employee cannot access RBAC
+      // Analyst cannot delete projects
+      expect(result.current.hasPermission('projects', 'delete')).toBe(false);
+
+      // Analyst cannot access RBAC
       expect(result.current.hasPermission('rbac', 'read')).toBe(false);
     });
   });
 
   describe('canAccessProject', () => {
-    it('should allow super admin to access any project', () => {
-      const mockUser = createMockSuperAdmin();
+    it('should allow super user to access any project', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -191,8 +199,8 @@ describe('usePermissions', () => {
       expect(result.current.canAccessProject('another-project')).toBe(true);
     });
 
-    it('should allow finance manager to access any project (read-only)', () => {
-      const mockUser = createMockFinanceManager();
+    it('should allow finance incharge to access any project (read-only)', () => {
+      const mockUser = createMockFinanceIncharge();
       const mockRoles = [createMockFinanceManagerRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -202,9 +210,10 @@ describe('usePermissions', () => {
       expect(result.current.canAccessProject('any-project')).toBe(true);
     });
 
-    it('should only allow project manager to access their managed projects', () => {
+    it('should only allow project manager to access their assigned projects', () => {
+      // New RBAC: User has `projects` array instead of `managedProjects`
       const mockUser = createMockProjectManager({
-        managedProjects: ['project-1', 'project-2'],
+        projects: ['project-1', 'project-2'],
       });
       const mockRoles = [createMockProjectManagerRole()];
 
@@ -217,9 +226,10 @@ describe('usePermissions', () => {
       expect(result.current.canAccessProject('project-3')).toBe(false);
     });
 
-    it('should allow employee to access their member projects', () => {
-      const mockUser = createMockEmployee({
-        memberProjects: ['project-1'],
+    it('should allow analyst to access their assigned projects', () => {
+      // New RBAC: User has `projects` array instead of `memberProjects`
+      const mockUser = createMockAnalyst({
+        projects: ['project-1'],
       });
       const mockRoles = [createMockEmployeeRole()];
 
@@ -241,8 +251,8 @@ describe('usePermissions', () => {
   });
 
   describe('canManageProject', () => {
-    it('should allow super admin to manage any project', () => {
-      const mockUser = createMockSuperAdmin();
+    it('should allow super user to manage any project', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -254,7 +264,7 @@ describe('usePermissions', () => {
 
     it('should only allow project manager to manage their projects', () => {
       const mockUser = createMockProjectManager({
-        managedProjects: ['project-1'],
+        projects: ['project-1'],
       });
       const mockRoles = [createMockProjectManagerRole()];
 
@@ -266,8 +276,8 @@ describe('usePermissions', () => {
       expect(result.current.canManageProject('project-2')).toBe(false);
     });
 
-    it('should not allow finance manager to manage projects', () => {
-      const mockUser = createMockFinanceManager();
+    it('should not allow finance incharge to manage projects', () => {
+      const mockUser = createMockFinanceIncharge();
       const mockRoles = [createMockFinanceManagerRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -279,8 +289,8 @@ describe('usePermissions', () => {
   });
 
   describe('canAccessSensitiveData', () => {
-    it('should allow super admin to access sensitive data', () => {
-      const mockUser = createMockSuperAdmin();
+    it('should allow super user to access sensitive data', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -290,8 +300,8 @@ describe('usePermissions', () => {
       expect(result.current.canAccessSensitiveData).toBe(true);
     });
 
-    it('should allow finance manager to access sensitive data', () => {
-      const mockUser = createMockFinanceManager();
+    it('should allow finance incharge to access sensitive data', () => {
+      const mockUser = createMockFinanceIncharge();
       const mockRoles = [createMockFinanceManagerRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -312,8 +322,8 @@ describe('usePermissions', () => {
       expect(result.current.canAccessSensitiveData).toBe(false);
     });
 
-    it('should NOT allow employee to access sensitive data', () => {
-      const mockUser = createMockEmployee();
+    it('should NOT allow analyst to access sensitive data', () => {
+      const mockUser = createMockAnalyst();
       const mockRoles = [createMockEmployeeRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -325,8 +335,8 @@ describe('usePermissions', () => {
   });
 
   describe('canAccessAllProjects', () => {
-    it('should allow super admin to access all projects', () => {
-      const mockUser = createMockSuperAdmin();
+    it('should allow super user to access all projects', () => {
+      const mockUser = createMockSuperuser();
       const mockRoles = [createMockSuperAdminRole()];
 
       const { result } = renderHook(() => usePermissions(), {
@@ -336,8 +346,8 @@ describe('usePermissions', () => {
       expect(result.current.canAccessAllProjects).toBe(true);
     });
 
-    it('should allow finance manager to access all projects', () => {
-      const mockUser = createMockFinanceManager();
+    it('should allow finance incharge to access all projects', () => {
+      const mockUser = createMockFinanceIncharge();
       const mockRoles = [createMockFinanceManagerRole()];
 
       const { result } = renderHook(() => usePermissions(), {
