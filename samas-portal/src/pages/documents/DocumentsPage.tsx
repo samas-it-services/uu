@@ -17,7 +17,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { DocumentCard } from '@/components/documents/DocumentCard';
 import { DocumentUpload } from '@/components/documents/DocumentUpload';
 import { DocumentViewer } from '@/components/documents/DocumentViewer';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import {
   useFolderDocuments,
   useFolders,
@@ -171,26 +171,29 @@ export const DocumentsPage: FC = () => {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats - System-wide totals */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="p-4">
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              Total Documents
+              All Documents
             </div>
             <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-xs text-gray-400">System total</div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              Total Size
+              Total Storage
             </div>
             <div className="text-2xl font-bold">
               {formatFileSize(stats.totalSize)}
             </div>
+            <div className="text-xs text-gray-400">System total</div>
           </Card>
           <Card className="p-4">
-            <div className="text-sm text-gray-500 dark:text-gray-400">Files</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Uploaded Files</div>
             <div className="text-2xl font-bold">{stats.byType.file}</div>
+            <div className="text-xs text-gray-400">System total</div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -201,6 +204,7 @@ export const DocumentsPage: FC = () => {
                 stats.byType.google_sheet +
                 stats.byType.google_slide}
             </div>
+            <div className="text-xs text-gray-400">System total</div>
           </Card>
         </div>
       )}
@@ -369,6 +373,9 @@ export const DocumentsPage: FC = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Folder</DialogTitle>
+            <DialogDescription className="sr-only">
+              Create a new folder to organize your documents
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>

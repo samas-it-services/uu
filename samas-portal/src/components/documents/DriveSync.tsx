@@ -14,7 +14,7 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { driveService, DriveFile } from '@/services/google/drive';
@@ -299,6 +299,9 @@ export const DriveSync: FC<DriveSyncProps> = ({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Drive Sync Settings</DialogTitle>
+            <DialogDescription className="sr-only">
+              Configure Google Drive synchronization settings
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex items-center justify-between">

@@ -36,7 +36,12 @@ export interface TeamMember {
   userId: string;
   userName: string;
   userPhotoURL: string;
+  /** @deprecated Use projectRoleId instead for custom project roles */
   role: 'manager' | 'lead' | 'member' | 'viewer';
+  /** Reference to a project-specific role in projects/{projectId}/roles/{roleId} */
+  projectRoleId?: string;
+  /** Denormalized role name for display (from ProjectRole.name) */
+  projectRoleName?: string;
   joinedAt: Timestamp;
 }
 

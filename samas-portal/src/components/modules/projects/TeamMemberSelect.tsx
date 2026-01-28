@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { Search, UserPlus, X, Loader2, Crown, Shield, User, Eye } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 import { TeamMember } from '@/types/project';
+import { ProjectRole } from '@/types/projectRole';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -29,9 +30,13 @@ interface TeamMemberSelectProps {
   onAdd: (member: TeamMember) => Promise<void>;
   onRemove: (userId: string) => Promise<void>;
   onRoleChange: (userId: string, role: TeamMember['role']) => Promise<void>;
+  /** Called when project role is changed (new RBAC system) */
+  onProjectRoleChange?: (userId: string, projectRoleId: string, projectRoleName: string) => Promise<void>;
   managerId: string;
   canEdit?: boolean;
   isLoading?: boolean;
+  /** Project roles for the dropdown (new RBAC system) */
+  projectRoles?: ProjectRole[];
 }
 
 const roleConfig: Record<
@@ -50,12 +55,18 @@ export const TeamMemberSelect: FC<TeamMemberSelectProps> = ({
   onAdd,
   onRemove,
   onRoleChange,
+  onProjectRoleChange,
   managerId,
   canEdit = false,
   isLoading = false,
+  projectRoles = [],
 }) => {
+  const hasProjectRoles = projectRoles.length > 0;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<TeamMember['role']>('member');
+  const [selectedProjectRoleId, setSelectedProjectRoleId] = useState<string>(
+    projectRoles[0]?.id || ''
+  );
   const [addingUserId, setAddingUserId] = useState<string | null>(null);
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
   const [changingRoleUserId, setChangingRoleUserId] = useState<string | null>(null);
@@ -71,11 +82,14 @@ export const TeamMemberSelect: FC<TeamMemberSelectProps> = ({
   const handleAdd = async (user: User) => {
     setAddingUserId(user.id);
     try {
+      const selectedProjectRole = projectRoles.find((r) => r.id === selectedProjectRoleId);
       await onAdd({
         userId: user.id,
         userName: user.displayName,
         userPhotoURL: user.photoURL || '',
         role: selectedRole,
+        projectRoleId: hasProjectRoles ? selectedProjectRoleId : undefined,
+        projectRoleName: hasProjectRoles ? selectedProjectRole?.name : undefined,
         joinedAt: Timestamp.now(),
       });
       setSearchQuery('');
@@ -104,6 +118,19 @@ export const TeamMemberSelect: FC<TeamMemberSelectProps> = ({
     }
   };
 
+  const handleProjectRoleChange = async (userId: string, projectRoleId: string) => {
+    if (userId === managerId || !onProjectRoleChange) return;
+    setChangingRoleUserId(userId);
+    try {
+      const role = projectRoles.find((r) => r.id === projectRoleId);
+      if (role) {
+        await onProjectRoleChange(userId, projectRoleId, role.name);
+      }
+    } finally {
+      setChangingRoleUserId(null);
+    }
+  };
+
   return (
     <Card className="p-4">
       <div className="flex items-center justify-between mb-4">
@@ -126,19 +153,43 @@ export const TeamMemberSelect: FC<TeamMemberSelectProps> = ({
                 className="pl-10"
               />
             </div>
-            <Select
-              value={selectedRole}
-              onValueChange={(value) => setSelectedRole(value as TeamMember['role'])}
-            >
-              <SelectTrigger className="w-[120px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lead">Lead</SelectItem>
-                <SelectItem value="member">Member</SelectItem>
-                <SelectItem value="viewer">Viewer</SelectItem>
-              </SelectContent>
-            </Select>
+            {hasProjectRoles ? (
+              <Select
+                value={selectedProjectRoleId}
+                onValueChange={setSelectedProjectRoleId}
+              >
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectRoles.map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: role.color }}
+                        />
+                        {role.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Select
+                value={selectedRole}
+                onValueChange={(value) => setSelectedRole(value as TeamMember['role'])}
+              >
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lead">Lead</SelectItem>
+                  <SelectItem value="member">Member</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Search results */}
@@ -204,6 +255,7 @@ export const TeamMemberSelect: FC<TeamMemberSelectProps> = ({
               const roleInfo = roleConfig[member.role];
               const RoleIcon = roleInfo.icon;
               const isManager = member.userId === managerId;
+              const memberProjectRole = projectRoles.find((r) => r.id === member.projectRoleId);
 
               return (
                 <div
@@ -222,35 +274,78 @@ export const TeamMemberSelect: FC<TeamMemberSelectProps> = ({
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{member.userName}</span>
-                        <RoleIcon className={cn('h-4 w-4', roleInfo.color)} />
+                        {hasProjectRoles && memberProjectRole ? (
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: memberProjectRole.color }}
+                            title={memberProjectRole.name}
+                          />
+                        ) : (
+                          <RoleIcon className={cn('h-4 w-4', roleInfo.color)} />
+                        )}
                       </div>
-                      <span className="text-xs text-gray-500">{roleInfo.label}</span>
+                      <span className="text-xs text-gray-500">
+                        {hasProjectRoles && member.projectRoleName
+                          ? member.projectRoleName
+                          : roleInfo.label}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {canEdit && !isManager && (
                       <>
-                        <Select
-                          value={member.role}
-                          onValueChange={(value) =>
-                            handleRoleChange(member.userId, value as TeamMember['role'])
-                          }
-                          disabled={changingRoleUserId === member.userId}
-                        >
-                          <SelectTrigger className="w-[100px] h-8">
-                            {changingRoleUserId === member.userId ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <SelectValue />
-                            )}
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="lead">Lead</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="viewer">Viewer</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        {hasProjectRoles && onProjectRoleChange ? (
+                          <Select
+                            value={member.projectRoleId || ''}
+                            onValueChange={(value) =>
+                              handleProjectRoleChange(member.userId, value)
+                            }
+                            disabled={changingRoleUserId === member.userId}
+                          >
+                            <SelectTrigger className="w-[140px] h-8">
+                              {changingRoleUserId === member.userId ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <SelectValue placeholder="Select role" />
+                              )}
+                            </SelectTrigger>
+                            <SelectContent>
+                              {projectRoles.map((role) => (
+                                <SelectItem key={role.id} value={role.id}>
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="w-2 h-2 rounded-full"
+                                      style={{ backgroundColor: role.color }}
+                                    />
+                                    {role.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={member.role}
+                            onValueChange={(value) =>
+                              handleRoleChange(member.userId, value as TeamMember['role'])
+                            }
+                            disabled={changingRoleUserId === member.userId}
+                          >
+                            <SelectTrigger className="w-[100px] h-8">
+                              {changingRoleUserId === member.userId ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <SelectValue />
+                              )}
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="lead">Lead</SelectItem>
+                              <SelectItem value="member">Member</SelectItem>
+                              <SelectItem value="viewer">Viewer</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
 
                         <Button
                           variant="ghost"

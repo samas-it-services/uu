@@ -1,6 +1,6 @@
 import { FC, useCallback, useState } from 'react';
 import { Upload, X, File, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -132,6 +132,9 @@ export const DocumentUpload: FC<DocumentUploadProps> = ({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Upload Documents</DialogTitle>
+          <DialogDescription className="sr-only">
+            Upload one or more documents with optional metadata and tags
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

@@ -11,6 +11,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.5 - 2026-01-27 | 🚀 feat: Project-level RBAC and Production Fixes
+
+### 📄 Summary
+Implemented project-specific roles with custom permissions using an additive model. Fixed production issues including superuser role detection, dialog accessibility, and document stats labeling.
+
+### 📁 Files Changed
+**New Files:**
+- `src/types/projectRole.ts` - ProjectRole type with 4 default role templates
+- `src/services/api/projectRoles.ts` - CRUD API for `projects/{projectId}/roles` subcollection
+- `src/hooks/useProjectRoles.ts` - React Query hooks for project roles
+- `src/components/modules/projects/ProjectRoleModal.tsx` - Modal for create/edit roles
+- `src/components/modules/projects/ProjectRolesSettings.tsx` - Settings tab content
+- `scripts/fixSuperuserRoles.ts` - Admin script to fix user roles in Firestore
+
+**Modified Files:**
+- `src/types/project.ts` - Added `projectRoleId`, `projectRoleName` to TeamMember
+- `src/hooks/usePermissions.ts` - Added `hasProjectPermission()`, `getUserProjectRole()`
+- `src/hooks/useProjects.ts` - Added `useUpdateTeamMemberProjectRole` hook
+- `src/services/api/projects.ts` - Auto-creates default roles on project creation
+- `src/components/modules/projects/TeamMemberSelect.tsx` - Dynamic project role dropdown
+- `src/pages/projects/ProjectDetailPage.tsx` - Added Settings tab for superusers
+- `src/pages/documents/DocumentsPage.tsx` - Clarified stats as system-wide totals
+- `firestore.rules` - Added rules for project roles subcollection
+- `src/services/api/auditLogs.ts` - Added new audit action types
+- 9 dialog components - Added `DialogDescription` for WCAG accessibility
+
+### 🧠 Rationale
+1. **Project-level RBAC**: Project team roles (manager, lead, member, viewer) had no permissions. Now each project can define custom roles with granular permissions.
+2. **Additive model**: Project roles ADD to system roles, not replace them. User can access a resource if they have permission via system role OR project role.
+3. **Production fixes**: Users weren't seeing data because their Firestore document lacked `role: 'superuser'`. Dialog warnings appeared due to missing DialogDescription.
+
+### 🔄 Behavior / Compatibility Implications
+- **New projects**: Automatically get 4 default roles (Project Admin, Developer, Reviewer, Observer)
+- **Existing projects**: Need migration to create roles subcollection
+- **Team members**: Can now have `projectRoleId` in addition to legacy `role` field
+- **Backward compatible**: Legacy role field still works; projectRoleId is optional
+
+### 🧪 Testing Recommendations
+1. Create new project - verify 4 default roles in Settings tab
+2. Add team member - select from project roles dropdown
+3. Edit project role permissions - verify changes persist
+4. Test permission boundaries - user with Observer role should be read-only
+5. Run `npm test` and `npm run test:e2e`
+
+### 📌 Follow-ups
+- Create migration script for existing projects
+- Add E2E tests for project roles management
+- Add integration tests for useProjectRoles hook
+
+---
+
 ## 0.5.4 - 2026-01-27 | 🐛 fix: E2E authentication with Firebase emulators
 
 ### 📄 Summary

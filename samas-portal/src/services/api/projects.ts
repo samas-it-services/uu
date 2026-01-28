@@ -17,6 +17,7 @@ import {
   arrayRemove,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
+import { projectRolesApi } from './projectRoles';
 import {
   Project,
   ProjectStatus,
@@ -216,6 +217,28 @@ export const projectsApi = {
       updatedAt: now,
     });
 
+    // Create default project roles in the subcollection
+    await projectRolesApi.createDefaultRoles(docRef.id);
+
+    // Update the manager's team member record with their project role
+    const adminRole = await projectRolesApi.getAdminRole(docRef.id);
+    if (adminRole) {
+      const projectDoc = doc(db, PROJECTS_COLLECTION, docRef.id);
+      await updateDoc(projectDoc, {
+        teamMembers: [
+          {
+            userId: data.managerId,
+            userName: data.managerName,
+            userPhotoURL: '',
+            role: 'manager',
+            projectRoleId: adminRole.id,
+            projectRoleName: adminRole.name,
+            joinedAt: now,
+          },
+        ],
+      });
+    }
+
     return docRef.id;
   },
 
@@ -313,6 +336,53 @@ export const projectsApi = {
     await updateDoc(docRef, {
       teamMembers: updatedMembers,
       updatedAt: Timestamp.now(),
+    });
+  },
+
+  /**
+   * Update a team member's project role (new RBAC system)
+   */
+  async updateTeamMemberProjectRole(
+    projectId: string,
+    userId: string,
+    projectRoleId: string,
+    projectRoleName: string
+  ): Promise<void> {
+    const project = await this.getById(projectId);
+    if (!project) return;
+
+    const updatedMembers = project.teamMembers.map((m) =>
+      m.userId === userId
+        ? { ...m, projectRoleId, projectRoleName }
+        : m
+    );
+
+    const docRef = doc(db, PROJECTS_COLLECTION, projectId);
+    await updateDoc(docRef, {
+      teamMembers: updatedMembers,
+      updatedAt: Timestamp.now(),
+    });
+  },
+
+  /**
+   * Add a team member with a project role
+   */
+  async addTeamMemberWithRole(
+    projectId: string,
+    member: Omit<TeamMember, 'joinedAt'>,
+    projectRoleId: string,
+    projectRoleName: string
+  ): Promise<void> {
+    const docRef = doc(db, PROJECTS_COLLECTION, projectId);
+    const now = Timestamp.now();
+    await updateDoc(docRef, {
+      teamMembers: arrayUnion({
+        ...member,
+        projectRoleId,
+        projectRoleName,
+        joinedAt: now,
+      }),
+      updatedAt: now,
     });
   },
 

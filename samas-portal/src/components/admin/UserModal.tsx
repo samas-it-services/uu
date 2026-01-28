@@ -6,6 +6,7 @@ import { User } from '@/types/user';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -84,6 +85,9 @@ export const UserModal: FC<UserModalProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{user ? 'Edit User' : 'Add New User'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {user ? 'Edit user details including email, name, and status' : 'Create a new user account'}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div className="space-y-2">

@@ -15,6 +15,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
@@ -179,6 +180,9 @@ export const MeetingScheduler: FC<MeetingSchedulerProps> = ({
               <Video className="h-5 w-5 text-blue-500" />
               Schedule Meeting
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Schedule a new meeting with automatic Google Meet link
+            </DialogDescription>
             <button
               onClick={() => setShowModal(false)}
               className="absolute right-4 top-4 text-gray-400 hover:text-gray-500"

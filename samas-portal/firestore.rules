@@ -102,6 +102,16 @@ service cloud.firestore {
         allow create: if isAuthenticated() && isProjectMember(projectId);
         allow update, delete: if false; // Immutable
       }
+
+      // Project roles subcollection (project-specific RBAC)
+      match /roles/{roleId} {
+        allow read: if isAuthenticated() && (
+          isSuperuser() || isProjectMember(projectId)
+        );
+        allow create, update, delete: if isSuperuser() || (
+          isProjectManager() && isProjectMember(projectId)
+        );
+      }
     }
 
     // ============ TASKS ============

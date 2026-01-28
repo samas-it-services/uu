@@ -22,6 +22,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { ProjectModal } from '@/components/modules/projects/ProjectModal';
 import { MilestoneTimeline, Milestone } from '@/components/modules/projects/MilestoneTimeline';
 import { TeamMemberSelect } from '@/components/modules/projects/TeamMemberSelect';
+import { ProjectRolesSettings } from '@/components/modules/projects/ProjectRolesSettings';
 import {
   useProject,
   useProjectStats,
@@ -30,7 +31,9 @@ import {
   useAddTeamMember,
   useRemoveTeamMember,
   useUpdateTeamMemberRole,
+  useUpdateTeamMemberProjectRole,
 } from '@/hooks/useProjects';
+import { useProjectRoles } from '@/hooks/useProjectRoles';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useAuth } from '@/hooks/useAuth';
 import { ProjectStatus, ProjectPriority, TeamMember } from '@/types/project';
@@ -58,17 +61,19 @@ export const ProjectDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   useAuth();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, isSuperAdmin } = usePermissions();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'team' | 'tasks' | 'documents'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'team' | 'tasks' | 'documents' | 'settings'>('overview');
 
   const { data: project, isLoading } = useProject(id || '');
   const { data: stats } = useProjectStats(id || '');
+  const { data: projectRoles } = useProjectRoles(id);
   const deleteProject = useDeleteProject();
   const archiveProject = useArchiveProject();
   const addTeamMember = useAddTeamMember();
   const removeTeamMember = useRemoveTeamMember();
   const updateTeamMemberRole = useUpdateTeamMemberRole();
+  const updateTeamMemberProjectRole = useUpdateTeamMemberProjectRole();
 
   const canEdit = hasPermission('projects', 'update');
   const canDelete = hasPermission('projects', 'delete');
@@ -138,6 +143,15 @@ export const ProjectDetailPage: FC = () => {
 
   const handleRoleChange = async (userId: string, role: TeamMember['role']) => {
     await updateTeamMemberRole.mutateAsync({ projectId: project.id, userId, role });
+  };
+
+  const handleProjectRoleChange = async (userId: string, projectRoleId: string, projectRoleName: string) => {
+    await updateTeamMemberProjectRole.mutateAsync({
+      projectId: project.id,
+      userId,
+      projectRoleId,
+      projectRoleName,
+    });
   };
 
   return (
@@ -267,6 +281,7 @@ export const ProjectDetailPage: FC = () => {
             { id: 'team', label: 'Team', icon: Users },
             { id: 'tasks', label: 'Tasks', icon: ListTodo },
             { id: 'documents', label: 'Documents', icon: FileText },
+            ...(isSuperAdmin ? [{ id: 'settings', label: 'Settings', icon: Settings }] : []),
           ].map((tab) => (
             <button
               key={tab.id}
@@ -408,8 +423,10 @@ export const ProjectDetailPage: FC = () => {
           onAdd={handleAddMember}
           onRemove={handleRemoveMember}
           onRoleChange={handleRoleChange}
+          onProjectRoleChange={handleProjectRoleChange}
           managerId={project.managerId}
           canEdit={canEdit}
+          projectRoles={projectRoles}
         />
       )}
 
@@ -441,6 +458,10 @@ export const ProjectDetailPage: FC = () => {
             </Button>
           </Link>
         </Card>
+      )}
+
+      {activeTab === 'settings' && isSuperAdmin && (
+        <ProjectRolesSettings projectId={project.id} />
       )}
 
       {/* Edit Modal */}

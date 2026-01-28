@@ -15,7 +15,7 @@ import {
   History,
 } from 'lucide-react';
 import { Document } from '@/types/document';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
@@ -78,6 +78,9 @@ export const DocumentViewer: FC<DocumentViewerProps> = ({
               )}
             </DialogTitle>
           </div>
+          <DialogDescription className="sr-only">
+            View document details, preview content, and manage sharing
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden flex gap-4">

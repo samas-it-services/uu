@@ -12,7 +12,7 @@ import {
   RefreshCw,
   AlertCircle,
 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
@@ -200,6 +200,9 @@ export const GoogleDrivePicker: FC<GoogleDrivePickerProps> = ({
             />
             Select from Google Drive
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Browse and select files from your Google Drive
+          </DialogDescription>
         </DialogHeader>
 
         {hasAccess === false ? (

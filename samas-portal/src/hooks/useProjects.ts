@@ -384,3 +384,50 @@ export const useUpdateProjectBudget = () => {
     },
   });
 };
+
+/**
+ * Hook to update a team member's project role (new RBAC system)
+ */
+export const useUpdateTeamMemberProjectRole = () => {
+  const queryClient = useQueryClient();
+  const { success, error } = useToast();
+  const { user: currentUser } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      userId,
+      projectRoleId,
+      projectRoleName,
+    }: {
+      projectId: string;
+      userId: string;
+      projectRoleId: string;
+      projectRoleName: string;
+    }) => {
+      const project = await projectsApi.getById(projectId);
+      await projectsApi.updateTeamMemberProjectRole(projectId, userId, projectRoleId, projectRoleName);
+      if (currentUser && project) {
+        await createAuditLog({
+          action: 'project.team_member_role_changed',
+          entityType: 'project',
+          entityId: projectId,
+          entityName: project.name,
+          performedBy: {
+            id: currentUser.id,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+          },
+          changes: { after: { userId, projectRole: projectRoleName } },
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+      success('Team member role updated');
+    },
+    onError: (err) => {
+      error(`Failed to update role: ${err.message}`);
+    },
+  });
+};

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
 import { Expense, ExpenseCategory } from '@/types/expense';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
@@ -206,6 +206,9 @@ export const ExpenseModal: FC<ExpenseModalProps> = ({
           <DialogTitle>
             {expense ? 'Edit Expense' : 'New Expense'}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {expense ? 'Edit expense details including amount, category and receipts' : 'Create a new expense entry with optional receipts'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
