@@ -18,7 +18,7 @@ baseTest.describe('Dashboard', () => {
   baseTest.describe('Dashboard Elements', () => {
     baseTest('should have working login flow UI', async ({ page }) => {
       await page.goto('/login');
-      await expect(page.getByText('Welcome to SaMas Portal')).toBeVisible();
+      await expect(page.getByText('Welcome to saMas Portal')).toBeVisible();
       await expect(page.getByRole('button', { name: /sign in with google/i })).toBeVisible();
     });
   });

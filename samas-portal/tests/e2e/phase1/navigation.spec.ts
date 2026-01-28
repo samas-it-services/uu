@@ -13,7 +13,7 @@ test.describe('Navigation', () => {
 
     test('should load login page directly', async ({ page }) => {
       await page.goto('/login');
-      await expect(page.getByText('Welcome to SaMas Portal')).toBeVisible();
+      await expect(page.getByText('Welcome to saMas Portal')).toBeVisible();
     });
   });
 
@@ -43,7 +43,7 @@ test.describe('Navigation', () => {
     test('should have correct title on login page', async ({ page }) => {
       await page.goto('/login');
       // Check for page content that indicates we're on login
-      await expect(page.getByText('Welcome to SaMas Portal')).toBeVisible();
+      await expect(page.getByText('Welcome to saMas Portal')).toBeVisible();
     });
   });
 });

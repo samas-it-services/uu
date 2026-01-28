@@ -1,8 +1,8 @@
-# Product Requirements Document - SaMas Portal
+# Product Requirements Document - saMas Portal
 
 ## Product Vision
 
-SaMas IT Services Portal is a comprehensive company portal designed for managing projects, tasks, finances, and documents with enterprise-grade role-based access control.
+saMas IT Services Portal is a comprehensive company portal designed for managing projects, tasks, finances, and documents with enterprise-grade role-based access control.
 
 ---
 

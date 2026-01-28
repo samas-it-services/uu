@@ -1,4 +1,4 @@
-# SaMas Portal Architecture
+# saMas Portal Architecture
 
 ## Document Control
 
@@ -351,7 +351,7 @@ Admin: CustomFieldsPage
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        SaMas Portal                                      │
+│                        saMas Portal                                      │
 │                                                                          │
 │  ┌───────────────┐    ┌───────────────┐    ┌───────────────┐           │
 │  │ OAuth Token   │    │ Drive Service │    │ Calendar      │           │
@@ -377,7 +377,7 @@ Admin: CustomFieldsPage
 ### 5.2 External Data Import
 
 ```
-External Systems                          SaMas Portal
+External Systems                          saMas Portal
 ┌─────────────┐                    ┌──────────────────────┐
 │ CSV Export  │                    │                      │
 │ (Jira,      │───┐                │   Seed Script        │

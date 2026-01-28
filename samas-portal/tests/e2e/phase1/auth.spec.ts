@@ -13,13 +13,13 @@ test.describe('Authentication', () => {
       await expect(page).toHaveURL(/\/login/);
 
       // Should show welcome text
-      await expect(page.getByText('Welcome to SaMas Portal')).toBeVisible();
+      await expect(page.getByText('Welcome to saMas Portal')).toBeVisible();
 
       // Should show Google sign-in button
       await expect(page.getByRole('button', { name: /sign in with google/i })).toBeVisible();
 
       // Should show access restriction message
-      await expect(page.getByText('Access is restricted to authorized SaMas team members')).toBeVisible();
+      await expect(page.getByText('Access is restricted to authorized saMas team members')).toBeVisible();
     });
 
     test('should display Google sign-in button with icon', async ({ page }) => {

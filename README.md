@@ -1,8 +1,8 @@
-# SaMas IT Services - UU Repository
+# saMas IT Services - UU Repository
 
 [![CI/CD](https://github.com/samas-it-services/uu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samas-it-services/uu/actions/workflows/ci.yml)
 
-This repository contains the SaMas Portal - a task management and project collaboration platform.
+This repository contains the saMas Portal - a task management and project collaboration platform.
 
 ## Projects
 
@@ -40,4 +40,4 @@ uu/
 
 ## License
 
-Proprietary - SaMas IT Services
+Proprietary - saMas IT Services

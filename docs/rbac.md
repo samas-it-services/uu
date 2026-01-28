@@ -1,6 +1,6 @@
 # Firebase RBAC Implementation
 
-Role-Based Access Control (RBAC) system for the SaMas Portal.
+Role-Based Access Control (RBAC) system for the saMas Portal.
 
 ---
 

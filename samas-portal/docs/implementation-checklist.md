@@ -1,4 +1,4 @@
-# Implementation Checklist - SaMas Portal
+# Implementation Checklist - saMas Portal
 
 ## Phase 1: Foundation & Firebase Setup
 

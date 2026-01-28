@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)
-## SaMas IT Services Portal v1.0
+## saMas IT Services Portal v1.0
 
 ---
 
@@ -32,7 +32,7 @@
 ## 1. Executive Summary
 
 ### 1.1 Product Vision
-Create a comprehensive, secure company portal for SaMas IT Services (uu.samas.tech) that centralizes business operations including finance management, document management, project tracking, asset management, task management, and company communications—all integrated with Google Workspace for seamless productivity.
+Create a comprehensive, secure company portal for saMas IT Services (uu.samas.tech) that centralizes business operations including finance management, document management, project tracking, asset management, task management, and company communications—all integrated with Google Workspace for seamless productivity.
 
 ### 1.2 Key Differentiators
 - **Project-Scoped Security**: Each project has isolated assets, documents, and sensitive data
@@ -485,7 +485,7 @@ interface Project {
 ┌─────────────────────────────────────────────────────────┐
 │ Task: Implement User Authentication            [Close X]│
 ├─────────────────────────────────────────────────────────┤
-│ Project: SaMas Portal    Status: In Progress            │
+│ Project: saMas Portal    Status: In Progress            │
 ├─────────────────────────────────────────────────────────┤
 │ Description:                                            │
 │ Set up Firebase Auth with Google Sign-In...             │
@@ -635,7 +635,7 @@ Default columns:
 
 #### 7.1.3 Folder Structure
 ```
-SaMas Portal (Shared Drive)
+saMas Portal (Shared Drive)
 ├── Company Documents/
 │   ├── Policies/
 │   └── Templates/
@@ -697,7 +697,7 @@ After meeting:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    SaMas Portal                              │
+│                    saMas Portal                              │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │   Drive     │  │  Calendar   │  │    Meet     │         │
@@ -738,7 +738,7 @@ After meeting:
 #### Desktop
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 🏢 SaMas Portal          🔍 Search...    🔔 👤 Settings    │
+│ 🏢 saMas Portal          🔍 Search...    🔔 👤 Settings    │
 ├────────────┬────────────────────────────────────────────────┤
 │            │                                                │
 │ 📊 Dashboard│                                               │
@@ -757,7 +757,7 @@ After meeting:
 #### Mobile
 ```
 ┌─────────────────────┐
-│ ≡  SaMas Portal  🔔 │
+│ ≡  saMas Portal  🔔 │
 ├─────────────────────┤
 │                     │
 │   Main Content      │

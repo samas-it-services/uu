@@ -1,11 +1,11 @@
 # Implementation Checklist
-## SaMas IT Services Portal
+## saMas IT Services Portal
 
 ---
 
 ## Overview
 
-This checklist tracks the complete implementation of the SaMas Portal across all 6 phases and 12 agent roles.
+This checklist tracks the complete implementation of the saMas Portal across all 6 phases and 12 agent roles.
 
 **Total Estimated Duration**: 5-6 weeks
 **Last Updated**: 2025-01-25

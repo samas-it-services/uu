@@ -1,4 +1,4 @@
-# Claude Code Instructions - SaMas Portal
+# Claude Code Instructions - saMas Portal
 
 ## Critical Rules
 
@@ -10,7 +10,7 @@
 
 ## Project Overview
 
-SaMas IT Services Portal - A comprehensive company portal with:
+saMas IT Services Portal - A comprehensive company portal with:
 - Role-based access control (RBAC)
 - Project-scoped security (PMs only see their projects)
 - Sensitive data protection (only admin/finance see financials)

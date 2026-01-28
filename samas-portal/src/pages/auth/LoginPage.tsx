@@ -54,7 +54,7 @@ export const LoginPage: FC = () => {
               />
             </svg>
           </div>
-          <CardTitle className="text-2xl">Welcome to SaMas Portal</CardTitle>
+          <CardTitle className="text-2xl">Welcome to saMas Portal</CardTitle>
           <CardDescription>
             Sign in with your Google account to access the company portal
           </CardDescription>
@@ -88,7 +88,7 @@ export const LoginPage: FC = () => {
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
-            <p>Access is restricted to authorized SaMas team members.</p>
+            <p>Access is restricted to authorized saMas team members.</p>
             <p className="mt-2">
               Contact your administrator if you need access.
             </p>

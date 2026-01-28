@@ -1,4 +1,4 @@
-# Technical Design Document - SaMas Portal
+# Technical Design Document - saMas Portal
 
 ## Architecture Overview
 

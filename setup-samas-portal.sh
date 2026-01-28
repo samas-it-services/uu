@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # =============================================================================
-# SaMas IT Services Portal - Complete Project Setup Script
+# saMas IT Services Portal - Complete Project Setup Script
 # =============================================================================
 # This script creates the entire project structure with all documentation,
-# configurations, and boilerplate code for the SaMas Portal.
+# configurations, and boilerplate code for the saMas Portal.
 #
 # Usage:
 #   chmod +x setup-samas-portal.sh
@@ -20,7 +20,7 @@
 
 set -e
 
-echo "🚀 Creating SaMas IT Services Portal..."
+echo "🚀 Creating saMas IT Services Portal..."
 echo "============================================"
 
 # Create project directory
@@ -196,9 +196,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'SaMas IT Services Portal',
-        short_name: 'SaMas Portal',
-        description: 'Company portal for SaMas IT Services',
+        name: 'saMas IT Services Portal',
+        short_name: 'saMas Portal',
+        description: 'Company portal for saMas IT Services',
         theme_color: '#2563eb',
         background_color: '#ffffff',
         display: 'standalone',
@@ -446,13 +446,13 @@ cat > index.html << 'INDEX_HTML'
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="SaMas IT Services Portal - Company portal for managing projects, tasks, expenses, and more" />
+    <meta name="description" content="saMas IT Services Portal - Company portal for managing projects, tasks, expenses, and more" />
     <meta name="theme-color" content="#2563eb" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <title>SaMas Portal</title>
+    <title>saMas Portal</title>
   </head>
   <body>
     <div id="root"></div>
@@ -1191,7 +1191,7 @@ CI_WORKFLOW
 echo "🤖 Creating Claude Code instructions..."
 
 cat > .claude/claude.md << 'CLAUDE_MD'
-# Claude Code Instructions - SaMas Portal
+# Claude Code Instructions - saMas Portal
 
 ## Critical Rules
 
@@ -1203,7 +1203,7 @@ cat > .claude/claude.md << 'CLAUDE_MD'
 
 ## Project Overview
 
-SaMas IT Services Portal - A comprehensive company portal with:
+saMas IT Services Portal - A comprehensive company portal with:
 - Role-based access control (RBAC)
 - Project-scoped security (PMs only see their projects)
 - Sensitive data protection (only admin/finance see financials)
@@ -1679,7 +1679,7 @@ export const MainLayout: FC<PropsWithChildren> = ({ children }) => {
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            SaMas Portal
+            saMas Portal
           </h1>
         </div>
       </header>
@@ -1701,7 +1701,7 @@ export const LoginPage: FC = () => {
       <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            SaMas Portal
+            saMas Portal
           </h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Sign in to your account
@@ -1782,12 +1782,12 @@ FIREBASE_CONFIG
 echo "📚 Creating documentation..."
 
 cat > README.md << 'README_MD'
-# SaMas IT Services Portal
+# saMas IT Services Portal
 
 [![Build Status](https://github.com/your-org/samas-portal/workflows/CI/CD/badge.svg)](https://github.com/your-org/samas-portal/actions)
 [![Coverage](https://codecov.io/gh/your-org/samas-portal/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/samas-portal)
 
-A comprehensive company portal for SaMas IT Services with role-based access control, project management, expense tracking, and more.
+A comprehensive company portal for saMas IT Services with role-based access control, project management, expense tracking, and more.
 
 ## Features
 
@@ -1837,7 +1837,7 @@ npm test
 
 ## License
 
-Private - SaMas IT Services
+Private - saMas IT Services
 README_MD
 
 cat > CHANGELOG.md << 'CHANGELOG_MD'
@@ -1878,7 +1878,7 @@ CHANGELOG_MD
 # =============================================================================
 
 echo ""
-echo "✅ SaMas Portal project created successfully!"
+echo "✅ saMas Portal project created successfully!"
 echo "============================================"
 echo ""
 echo "📁 Project location: $(pwd)"

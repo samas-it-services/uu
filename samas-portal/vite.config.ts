@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'SaMas IT Services Portal',
-        short_name: 'SaMas Portal',
-        description: 'Company portal for SaMas IT Services',
+        name: 'saMas IT Services Portal',
+        short_name: 'saMas Portal',
+        description: 'Company portal for saMas IT Services',
         theme_color: '#2563eb',
         background_color: '#ffffff',
         display: 'standalone',

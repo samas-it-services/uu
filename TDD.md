@@ -1,5 +1,5 @@
 # Technical Design Document (TDD)
-## SaMas IT Services Portal v1.0
+## saMas IT Services Portal v1.0
 
 ---
 
@@ -1380,7 +1380,7 @@ export const calendarService = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        summary: `${projectName} - SaMas Portal`,
+        summary: `${projectName} - saMas Portal`,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       }),
     });
@@ -1974,9 +1974,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'SaMas IT Services Portal',
-        short_name: 'SaMas Portal',
-        description: 'Company portal for SaMas IT Services',
+        name: 'saMas IT Services Portal',
+        short_name: 'saMas Portal',
+        description: 'Company portal for saMas IT Services',
         theme_color: '#2563eb',
         background_color: '#ffffff',
         display: 'standalone',
@@ -2092,7 +2092,7 @@ export const initializeNotifications = async () => {
   onMessage(messaging, (payload) => {
     const { title, body, icon } = payload.notification || {};
     
-    new Notification(title || 'SaMas Portal', {
+    new Notification(title || 'saMas Portal', {
       body,
       icon: icon || '/icons/icon-192x192.png',
       badge: '/icons/badge-72x72.png'
