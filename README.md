@@ -1,4 +1,4 @@
-# saMas IT Services - UU Repository
+# saMas IT Services - Uu Portal
 
 [![CI/CD](https://github.com/samas-it-services/uu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samas-it-services/uu/actions/workflows/ci.yml)
 
@@ -40,4 +40,4 @@ uu/
 
 ## License
 
-Proprietary - saMas IT Services
+AGPL-3.0 License

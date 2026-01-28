@@ -1,4 +1,4 @@
-# saMas Portal
+# Uu Portal
 
 [![CI/CD](https://github.com/samas-it-services/uu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samas-it-services/uu/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/samas-it-services/uu/branch/main/graph/badge.svg)](https://codecov.io/gh/samas-it-services/uu)
@@ -169,4 +169,4 @@ Build a platform where developers can publish **workflow modules** (automations)
 
 ## License
 
-Proprietary - saMas IT Services
+AGPL-3.0 License
