@@ -21,7 +21,12 @@ service cloud.firestore {
     }
 
     function isSuperuser() {
-      return isAuthenticated() && userDocExists() && getRole() == 'superuser';
+      return isAuthenticated() && (
+        // Check email first (allows access even if user doc doesn't exist yet or role not set)
+        request.auth.token.email in ['bill@samas.tech', 'bilgrami@gmail.com'] ||
+        // Then check role field in user document
+        (userDocExists() && getRole() == 'superuser')
+      );
     }
 
     function isProjectManager() {

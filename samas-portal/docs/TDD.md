@@ -351,3 +351,182 @@ function useCreateProjectRole(projectId: string) {
 - Test full user flows
 - Test authentication with Firebase emulators
 - Test permission boundaries
+
+---
+
+## Roadmap: Pluggable Modules Platform
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Main App Shell                            │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │  Navigation │  │  Project    │  │  Module     │              │
+│  │  (Dynamic)  │  │  Context    │  │  Loader     │              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+│  UI Modules   │  │   Workflow    │  │   Module      │
+│  (iframe/MFE) │  │   Engine      │  │   Registry    │
+└───────────────┘  └───────────────┘  └───────────────┘
+        │                  │                  │
+        └──────────────────┼──────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Firebase Backend                             │
+│  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐    │
+│  │  Auth  │  │Firestore│  │Storage │  │Functions│  │ Tasks  │    │
+│  └────────┘  └────────┘  └────────┘  └────────┘  └────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Module Registry Data Model
+
+```typescript
+interface ModuleDefinition {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  category: string;
+  type: 'workflow' | 'ui' | 'hybrid';
+  status: 'draft' | 'approved' | 'deprecated';
+
+  // Entry points
+  workflowDefRef?: string;           // Reference to workflow definition
+  uiEntryUrl?: string;               // URL for UI module (iframe/MFE)
+
+  // Configuration
+  configSchema: JSONSchema;          // Schema for module config
+  requiredPermissions: string[];     // Permissions needed to run
+
+  // Metadata
+  author: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+interface EnabledModule {
+  moduleId: string;
+  projectId: string;
+  enabled: boolean;
+  config: Record<string, unknown>;   // Module-specific config
+  schedule?: CronSchedule;           // Optional cron schedule
+  menuLabel?: string;                // Custom menu label
+  menuOrder?: number;                // Menu position
+
+  // RBAC
+  allowedRoles: string[];            // Project roles that can run
+
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+interface WorkflowRun {
+  id: string;
+  moduleId: string;
+  projectId: string;
+
+  // Execution
+  trigger: 'manual' | 'schedule' | 'webhook' | 'event';
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  startedAt: Timestamp;
+  completedAt?: Timestamp;
+
+  // Data
+  inputs: Record<string, unknown>;
+  outputs?: Record<string, unknown>;
+  error?: string;
+  logs: ExecutionLog[];
+
+  // Initiator
+  initiatedBy: string;
+  initiatedByName: string;
+}
+```
+
+### Workflow Execution Flow
+
+```
+Manual Run / Schedule / Webhook
+            │
+            ▼
+    ┌───────────────┐
+    │  Validate     │ ─── Check RBAC, config, module status
+    │  Request      │
+    └───────┬───────┘
+            │
+            ▼
+    ┌───────────────┐
+    │  Create Run   │ ─── Insert run document with status='queued'
+    │  Document     │
+    └───────┬───────┘
+            │
+            ▼
+    ┌───────────────┐
+    │  Enqueue via  │ ─── Cloud Tasks for async execution
+    │  Cloud Tasks  │
+    └───────┬───────┘
+            │
+            ▼
+    ┌───────────────┐
+    │  Cloud Run    │ ─── Execute workflow nodes
+    │  Worker       │ ─── Resolve secrets, make HTTP calls
+    └───────┬───────┘ ─── Persist logs, outputs
+            │
+            ▼
+    ┌───────────────┐
+    │  Update Run   │ ─── status='completed'|'failed'
+    │  Document     │ ─── Store outputs or error
+    └───────────────┘
+```
+
+### UI Module Integration
+
+```typescript
+// Route pattern for UI modules
+// /projects/{projectId}/apps/{appId}
+
+interface UIModuleProps {
+  projectId: string;
+  moduleId: string;
+  authToken: string;
+  config: Record<string, unknown>;
+}
+
+// Shell passes context to UI module via:
+// 1. URL params (projectId, moduleId)
+// 2. PostMessage (authToken, config)
+// 3. Query params (limited data)
+
+// UI module can:
+// 1. Call Firebase APIs with passed token
+// 2. Call custom backend APIs
+// 3. Interact with shell via PostMessage
+```
+
+### RBAC for Modules
+
+```typescript
+// Module-level roles (additive to project roles)
+interface ModulePermission {
+  moduleId: string;
+  roles: {
+    runner: string[];    // Can run the module
+    editor: string[];    // Can configure the module
+    viewer: string[];    // Can view run history
+  };
+}
+
+// Permission check flow:
+// 1. Is user superuser? → Allow all
+// 2. Is user project admin? → Allow all for project modules
+// 3. Is user in module.roles[action]? → Allow
+// 4. Deny
+```

@@ -130,6 +130,57 @@
 - [x] DialogDescription added to 9 dialog components
 - [x] Documents stats labels clarified as system-wide totals
 
+## Bug Fixes & Documentation (v0.5.6)
+
+- [x] Select component rewrite (shadcn/ui pattern)
+- [x] Firestore rules email-based superuser check
+- [x] AuditLogsPage Select usage update
+- [x] README.md with CI badges and roadmap
+
+## Phase 8: Pluggable Modules Platform (Future)
+
+### Module Registry
+- [ ] ModuleDefinition type and schema
+- [ ] moduleRegistry API service
+- [ ] useModuleRegistry hooks
+- [ ] Module catalog page (/admin/modules)
+- [ ] Module approval workflow
+
+### Per-Project Installation
+- [ ] EnabledModule type and schema
+- [ ] Project modules settings tab
+- [ ] Module configuration UI
+- [ ] Menu injection for enabled modules
+
+### Workflow Engine
+- [ ] WorkflowDefinition type
+- [ ] Workflow runner service (Cloud Functions)
+- [ ] Cloud Tasks integration for async execution
+- [ ] WorkflowRun type and execution tracking
+- [ ] Run history page
+
+### UI Modules
+- [ ] UIApp type and schema
+- [ ] Iframe/micro-frontend loader component
+- [ ] PostMessage bridge for auth/context
+- [ ] Dynamic route registration
+
+### Scheduling
+- [ ] CronSchedule type
+- [ ] Schedule management UI
+- [ ] Cloud Scheduler integration
+- [ ] Timezone support
+
+### Secrets Management
+- [ ] Google Secret Manager integration
+- [ ] Secrets configuration UI (admin only)
+- [ ] Secret reference resolution in workflows
+
+### Module RBAC
+- [ ] Module-level roles (runner, editor, viewer)
+- [ ] Permission check integration
+- [ ] Firestore rules for modules
+
 ---
 
 ## Legend
@@ -155,3 +206,4 @@
 | 0.5.3 | 2026-01-27 | Runtime + folder permission fixes |
 | 0.5.4 | 2026-01-27 | E2E auth fix |
 | 0.5.5 | 2026-01-27 | Project-level RBAC + production fixes |
+| 0.5.6 | 2026-01-27 | Select component fix + Firestore rules + README |

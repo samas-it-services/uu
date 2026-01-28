@@ -119,3 +119,71 @@ Each project can define custom roles with granular permissions:
 - **Forms**: React Hook Form + Zod
 - **DnD**: @dnd-kit
 - **Testing**: Vitest + Playwright
+
+---
+
+## Roadmap: Pluggable Modules Platform
+
+### Vision
+
+Build a platform where developers can publish **workflow modules** (n8n-style automations) and **UI modules** (screens/apps) that project admins can install per-project.
+
+### Must-Have Features
+
+| Feature | Description |
+|---------|-------------|
+| **Module Registry** | Global catalog of workflow and UI modules with versioning |
+| **Per-Project Installation** | Enable/disable modules per project with configuration |
+| **Workflow Engine** | Manual runs, scheduled cron jobs, webhook/event triggers |
+| **UI Module Integration** | Dynamic menu items via micro-frontend or iframe |
+| **Fine-grained RBAC** | Module-level permissions (Runner, Editor, Viewer) |
+| **Scheduling & Cron** | Timezone-aware job scheduling with execution history |
+| **Secrets Management** | Google Secret Manager integration for secure credentials |
+| **Audit Logs** | Immutable run history with inputs/outputs/errors |
+
+### Nice-to-Have Features
+
+- Visual workflow builder (n8n-style node editor)
+- Marketplace for third-party modules
+- Module signing / verification
+- Billing and usage tracking
+- Rate limits per module
+
+### Module Types
+
+| Type | Description |
+|------|-------------|
+| `workflow` | Background automation jobs (cron, webhook, manual) |
+| `ui` | Embedded UI screens and apps |
+| `hybrid` | Both workflow and UI components |
+
+### Personas
+
+| Persona | Responsibilities |
+|---------|-----------------|
+| **Platform Admin** | Approves modules, manages system permissions, reviews security |
+| **Module Developer** | Publishes workflow/UI modules, manages versions |
+| **Project Admin** | Enables modules per project, configures schedules/secrets |
+| **Project Member** | Runs modules, views UI screens, views run history |
+
+### Data Model (Preview)
+
+```
+/moduleRegistry/{moduleId}           # Global module catalog
+/uiAppRegistry/{appId}               # UI app registry
+/workflowDefs/{moduleId}             # Workflow definitions
+
+/projects/{projectId}
+  /enabledModules/{moduleId}         # Per-project module config
+  /enabledUiApps/{appId}             # Per-project UI apps
+  /runs/{runId}                      # Workflow execution history
+```
+
+### Security Considerations
+
+- All writes validated server-side
+- Runner enforces project scoping
+- Node allowlists for workflow execution
+- CSP headers for UI modules
+- Domain allowlists for HTTP nodes
+- Signed module manifests (future)

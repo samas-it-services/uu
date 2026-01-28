@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
-import { Select, SelectItem } from '@/components/ui/Select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Avatar } from '@/components/ui/Avatar';
 
 const ACTION_FILTERS: { value: string; label: string }[] = [
@@ -147,16 +147,17 @@ export const AuditLogsPage: FC = () => {
             className="pl-9"
           />
         </div>
-        <Select
-          value={actionFilter}
-          onValueChange={setActionFilter}
-          placeholder="Filter by action"
-        >
-          {ACTION_FILTERS.map((filter) => (
-            <SelectItem key={filter.value} value={filter.value}>
-              {filter.label}
-            </SelectItem>
-          ))}
+        <Select value={actionFilter} onValueChange={setActionFilter}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Filter by action" />
+          </SelectTrigger>
+          <SelectContent>
+            {ACTION_FILTERS.map((filter) => (
+              <SelectItem key={filter.value} value={filter.value}>
+                {filter.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
         <div className="text-sm text-muted-foreground">
           {filteredLogs.length} log{filteredLogs.length !== 1 ? 's' : ''}

@@ -11,6 +11,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.6 - 2026-01-27 | 🐛 fix: Select component and Firestore superuser check
+
+### 📄 Summary
+Fixed broken dropdown menus (Status/Priority filters) on Projects page by rewriting the Select component to follow shadcn/ui patterns. Updated Firestore rules to check superuser by email in addition to role field. Added comprehensive README with CI badges and roadmap.
+
+### 📁 Files Changed
+**Modified Files:**
+- `src/components/ui/Select.tsx` - Complete rewrite with properly styled exports (SelectTrigger, SelectContent, SelectValue, etc.)
+- `src/pages/admin/AuditLogsPage.tsx` - Updated to use new Select component pattern
+- `firestore.rules` - Added email-based superuser check for hardcoded admin emails
+
+**New Files:**
+- `README.md` - Project documentation with CI badges, tech stack, setup guide, and roadmap
+
+### 🧠 Rationale
+1. **Select component broken**: Exported raw Radix primitives without styling. ProjectsPage passed SelectTrigger/SelectContent as children to Select, but the old component already rendered its own. Result: broken nested components with no styling.
+2. **Superuser not working**: Firestore rules only checked `role == 'superuser'` in database, but didn't know about hardcoded SUPER_ADMINS list in frontend. If user doc didn't have role set, access was denied.
+3. **Missing README**: No project documentation existed for onboarding or CI status visibility.
+
+### 🔄 Behavior / Compatibility Implications
+- **Select component API changed**: Now follows shadcn/ui pattern (separate Trigger/Content components)
+- **Superuser detection improved**: Email check happens first, then falls back to role field
+- **Requires Firestore deployment**: Run `firebase deploy --only firestore:rules`
+
+### 🧪 Testing Recommendations
+1. Verify Status/Priority dropdowns render and function on Projects page
+2. Verify superuser (bill@samas.tech) can see all projects after rules deployment
+3. Verify folders appear in Documents page after rules deployment
+4. Run `npm test` - all 102 tests should pass
+5. Run `npm run lint` and `npm run typecheck`
+
+### 📌 Follow-ups
+- Deploy Firestore rules (`firebase login --reauth && firebase deploy --only firestore:rules`)
+- Implement Pluggable Modules Platform (see roadmap in README)
+
+---
+
 ## 0.5.5 - 2026-01-27 | 🚀 feat: Project-level RBAC and Production Fixes
 
 ### 📄 Summary
