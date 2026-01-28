@@ -241,7 +241,9 @@ describe('useProjectRoles', () => {
         }
       });
 
-      expect(result.current.isError).toBe(true);
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
     });
   });
 
@@ -330,7 +332,9 @@ describe('useProjectRoles', () => {
         }
       });
 
-      expect(result.current.isError).toBe(true);
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
     });
   });
 
