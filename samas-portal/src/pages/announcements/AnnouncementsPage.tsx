@@ -34,8 +34,8 @@ import { Announcement, AnnouncementType, AnnouncementPriority } from '@/types/an
 import { AnnouncementFilters } from '@/services/api/announcements';
 import { announcementsApi } from '@/services/api/announcements';
 
-const typeOptions: { value: AnnouncementType | ''; label: string }[] = [
-  { value: '', label: 'All Types' },
+const typeOptions: { value: AnnouncementType | 'all'; label: string }[] = [
+  { value: 'all', label: 'All Types' },
   { value: 'general', label: 'General' },
   { value: 'policy', label: 'Policy' },
   { value: 'event', label: 'Event' },
@@ -44,8 +44,8 @@ const typeOptions: { value: AnnouncementType | ''; label: string }[] = [
   { value: 'celebration', label: 'Celebration' },
 ];
 
-const priorityOptions: { value: AnnouncementPriority | ''; label: string }[] = [
-  { value: '', label: 'All Priorities' },
+const priorityOptions: { value: AnnouncementPriority | 'all'; label: string }[] = [
+  { value: 'all', label: 'All Priorities' },
   { value: 'low', label: 'Low' },
   { value: 'normal', label: 'Normal' },
   { value: 'high', label: 'High' },
@@ -65,13 +65,13 @@ export const AnnouncementsPage: FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filters from URL params
-  const typeFilter = (searchParams.get('type') || '') as AnnouncementType | '';
-  const priorityFilter = (searchParams.get('priority') || '') as AnnouncementPriority | '';
+  const typeFilter = (searchParams.get('type') || 'all') as AnnouncementType | 'all';
+  const priorityFilter = (searchParams.get('priority') || 'all') as AnnouncementPriority | 'all';
 
   // Build filters for API
   const filters: AnnouncementFilters = {};
-  if (typeFilter) filters.type = typeFilter;
-  if (priorityFilter) filters.priority = priorityFilter;
+  if (typeFilter && typeFilter !== 'all') filters.type = typeFilter as AnnouncementType;
+  if (priorityFilter && priorityFilter !== 'all') filters.priority = priorityFilter as AnnouncementPriority;
 
   // Fetch data
   const { data: announcements, isLoading } = useAnnouncements(filters);
@@ -144,7 +144,7 @@ export const AnnouncementsPage: FC = () => {
 
   // Handlers
   const handleFilterChange = (key: string, value: string) => {
-    if (value) {
+    if (value && value !== 'all') {
       searchParams.set(key, value);
     } else {
       searchParams.delete(key);
@@ -202,7 +202,7 @@ export const AnnouncementsPage: FC = () => {
     setShowModal(true);
   };
 
-  const hasActiveFilters = typeFilter || priorityFilter || searchQuery;
+  const hasActiveFilters = (typeFilter && typeFilter !== 'all') || (priorityFilter && priorityFilter !== 'all') || searchQuery;
 
   return (
     <div className="p-6 space-y-6" data-testid="announcements-page">

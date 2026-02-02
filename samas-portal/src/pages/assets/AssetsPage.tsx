@@ -43,8 +43,8 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { Asset, AssetType, AssetStatus } from '@/types/asset';
 import { useActiveUsers } from '@/hooks/useUsers';
 
-const typeOptions: { value: AssetType | ''; label: string }[] = [
-  { value: '', label: 'All Types' },
+const typeOptions: { value: AssetType | 'all'; label: string }[] = [
+  { value: 'all', label: 'All Types' },
   { value: 'laptop', label: 'Laptop' },
   { value: 'desktop', label: 'Desktop' },
   { value: 'monitor', label: 'Monitor' },
@@ -61,8 +61,8 @@ const typeOptions: { value: AssetType | ''; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
-const statusOptions: { value: AssetStatus | ''; label: string }[] = [
-  { value: '', label: 'All Status' },
+const statusOptions: { value: AssetStatus | 'all'; label: string }[] = [
+  { value: 'all', label: 'All Status' },
   { value: 'available', label: 'Available' },
   { value: 'assigned', label: 'Assigned' },
   { value: 'maintenance', label: 'Maintenance' },
@@ -89,8 +89,8 @@ export const AssetsPage: FC = () => {
   const [includeGlobal, setIncludeGlobal] = useState(true);
 
   // Filters from URL params
-  const typeFilter = (searchParams.get('type') || '') as AssetType | '';
-  const statusFilter = (searchParams.get('status') || '') as AssetStatus | '';
+  const typeFilter = (searchParams.get('type') || 'all') as AssetType | 'all';
+  const statusFilter = (searchParams.get('status') || 'all') as AssetStatus | 'all';
   const projectIdParam = searchParams.get('project') || '';
 
   // Fetch projects
@@ -144,12 +144,12 @@ export const AssetsPage: FC = () => {
     let result = assets || [];
 
     // Filter by type
-    if (typeFilter) {
+    if (typeFilter && typeFilter !== 'all') {
       result = result.filter((a) => a.type === typeFilter);
     }
 
     // Filter by status
-    if (statusFilter) {
+    if (statusFilter && statusFilter !== 'all') {
       result = result.filter((a) => a.status === statusFilter);
     }
 
@@ -170,7 +170,7 @@ export const AssetsPage: FC = () => {
 
   // Handlers
   const handleFilterChange = (key: string, value: string) => {
-    if (value) {
+    if (value && value !== 'all') {
       searchParams.set(key, value);
     } else {
       searchParams.delete(key);
@@ -258,7 +258,7 @@ export const AssetsPage: FC = () => {
     }
   };
 
-  const hasActiveFilters = typeFilter || statusFilter || searchQuery;
+  const hasActiveFilters = (typeFilter && typeFilter !== 'all') || (statusFilter && statusFilter !== 'all') || searchQuery;
   const isLoading = projectsLoading || assetsLoading;
 
   // Get accessible projects for switcher
