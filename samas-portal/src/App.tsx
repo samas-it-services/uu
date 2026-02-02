@@ -10,6 +10,8 @@ import { ExpensesPage, ApprovalsPage, ReportsPage } from '@/pages/finance';
 import { DocumentsPage } from '@/pages/documents';
 import { ProjectsPage, ProjectDetailPage } from '@/pages/projects';
 import { KanbanPage } from '@/pages/tasks';
+import { AnnouncementsPage } from '@/pages/announcements';
+import { AssetsPage } from '@/pages/assets';
 import { Spinner } from '@/components/ui/Spinner';
 
 const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -74,6 +76,26 @@ const TasksRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { hasPermission } = usePermissions();
 
   if (!hasPermission('tasks', 'read')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AnnouncementsRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission('announcements', 'read')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AssetsRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission('assets', 'read')) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -170,6 +192,22 @@ export const App: FC = () => {
                     <TasksRoute>
                       <KanbanPage />
                     </TasksRoute>
+                  }
+                />
+                <Route
+                  path="/announcements"
+                  element={
+                    <AnnouncementsRoute>
+                      <AnnouncementsPage />
+                    </AnnouncementsRoute>
+                  }
+                />
+                <Route
+                  path="/assets"
+                  element={
+                    <AssetsRoute>
+                      <AssetsPage />
+                    </AssetsRoute>
                   }
                 />
               </Routes>

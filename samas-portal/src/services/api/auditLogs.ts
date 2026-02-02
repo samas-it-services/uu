@@ -63,13 +63,27 @@ export type AuditAction =
   | 'task.status_changed'
   | 'task.assigned'
   | 'task.comment_added'
+  | 'announcement.created'
+  | 'announcement.updated'
+  | 'announcement.deleted'
+  | 'announcement.published'
+  | 'announcement.unpublished'
+  | 'announcement.pinned'
+  | 'announcement.unpinned'
+  | 'asset.created'
+  | 'asset.updated'
+  | 'asset.deleted'
+  | 'asset.assigned'
+  | 'asset.unassigned'
+  | 'asset.status_updated'
+  | 'asset.maintenance_added'
   | 'login'
   | 'logout';
 
 export interface AuditLog {
   id: string;
   action: AuditAction;
-  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder' | 'project' | 'task';
+  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder' | 'project' | 'task' | 'announcement' | 'asset';
   entityId: string;
   entityName: string;
   performedBy: {
@@ -89,7 +103,7 @@ export interface AuditLog {
 
 export interface CreateAuditLogData {
   action: AuditAction;
-  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder' | 'project' | 'task';
+  entityType: 'user' | 'role' | 'session' | 'expense' | 'approval' | 'document' | 'folder' | 'project' | 'task' | 'announcement' | 'asset';
   entityId: string;
   entityName: string;
   performedBy: {

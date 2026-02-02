@@ -27,3 +27,9 @@ export type { CreateProjectData, UpdateProjectData, ProjectFilters } from './pro
 
 export { tasksApi } from './tasks';
 export type { CreateTaskData, UpdateTaskData, TaskFilters, ReorderTaskData } from './tasks';
+
+export { announcementsApi } from './announcements';
+export type { CreateAnnouncementData, UpdateAnnouncementData, AnnouncementFilters } from './announcements';
+
+export { assetsApi } from './assets';
+export type { CreateAssetData, UpdateAssetData, AssetFilters, CreateMaintenanceData } from './assets';

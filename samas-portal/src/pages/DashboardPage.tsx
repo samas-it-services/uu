@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserPlus, FolderPlus, Shield, FileText } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useActiveUsers } from '@/hooks/useUsers';
@@ -133,17 +135,17 @@ const AdminDashboard: FC = () => {
         </CardContent>
       </Card>
 
-    <Card>
+    <Card data-testid="quick-actions">
       <CardHeader>
         <CardTitle>Quick Actions</CardTitle>
         <CardDescription>Common administrative tasks</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-2">
-          <ActionButton icon="user-plus" label="Add New User" />
-          <ActionButton icon="folder-plus" label="Create Project" />
-          <ActionButton icon="shield" label="Manage Roles" />
-          <ActionButton icon="file-text" label="View Audit Logs" />
+          <ActionButton icon="user-plus" label="Add New User" to="/admin/users" />
+          <ActionButton icon="folder-plus" label="Create Project" to="/projects" />
+          <ActionButton icon="shield" label="Manage Roles" to="/admin/roles" />
+          <ActionButton icon="file-text" label="View Audit Logs" to="/admin/audit" />
         </div>
       </CardContent>
     </Card>
@@ -283,11 +285,27 @@ const EmployeeDashboard: FC = () => (
 );
 
 // Helper components
-const ActionButton: FC<{ icon: string; label: string }> = ({ label }) => (
-  <button className="flex w-full items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent">
-    {label}
-  </button>
-);
+const iconMap = {
+  'user-plus': UserPlus,
+  'folder-plus': FolderPlus,
+  'shield': Shield,
+  'file-text': FileText,
+};
+
+const ActionButton: FC<{ icon: keyof typeof iconMap; label: string; to: string }> = ({ icon, label, to }) => {
+  const navigate = useNavigate();
+  const Icon = iconMap[icon];
+
+  return (
+    <button
+      onClick={() => navigate(to)}
+      className="flex w-full items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent transition-colors"
+    >
+      {Icon && <Icon className="h-4 w-4" />}
+      {label}
+    </button>
+  );
+};
 
 const ExpenseItem: FC<{
   description: string;

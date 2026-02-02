@@ -11,6 +11,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.11 - 2026-02-01 | 🚀 feat: Dashboard, Announcements, and Assets modules
+
+### 📄 Summary
+Implemented three major features:
+1. **Dashboard Quick Actions** - Made the 4 admin quick action buttons functional with navigation
+2. **Announcements Module** - Full CRUD for company-wide and project-specific announcements
+3. **Assets Module** - Complete asset management with project-first view and global asset support
+
+### 📁 Files Changed
+**New Files (14):**
+- `src/services/api/announcements.ts` - Announcements API with targeting, filtering, read tracking
+- `src/services/api/assets.ts` - Assets API with project/global support, assignment, maintenance
+- `src/hooks/useAnnouncements.ts` - React Query hooks for announcements
+- `src/hooks/useAssets.ts` - React Query hooks for assets
+- `src/components/announcements/AnnouncementCard.tsx` - Announcement display card
+- `src/components/announcements/AnnouncementModal.tsx` - Create/edit announcement modal
+- `src/components/announcements/index.ts` - Component exports
+- `src/components/assets/AssetCard.tsx` - Asset display card (list/grid views)
+- `src/components/assets/AssetModal.tsx` - Create/edit asset modal
+- `src/components/assets/index.ts` - Component exports
+- `src/pages/announcements/AnnouncementsPage.tsx` - Announcements listing page
+- `src/pages/announcements/index.ts` - Page export
+- `src/pages/assets/AssetsPage.tsx` - Assets listing with project switcher
+- `src/pages/assets/index.ts` - Page export
+
+**Modified Files (4):**
+- `src/pages/DashboardPage.tsx` - Added navigation to quick action buttons with Lucide icons
+- `src/App.tsx` - Added routes for /announcements and /assets
+- `src/services/api/auditLogs.ts` - Added announcement and asset audit action types
+- `firestore.indexes.json` - Added indexes for assets collection and additional announcements queries
+
+### 🧠 Rationale
+1. **Dashboard Quick Actions**: Admin buttons were non-functional, just displaying text. Now navigate to proper admin pages.
+2. **Announcements**: Organizations need to communicate with employees via targeted announcements (global, project-specific, or role-specific). Supports pinning, expiration, and read tracking.
+3. **Assets**: Companies need to track IT equipment and assign to employees/projects. Project-first view with global toggle follows the established pattern.
+
+### 🔄 Behavior / Compatibility Implications
+- **New routes**: `/announcements` and `/assets` accessible to users with appropriate permissions
+- **Audit logging**: All announcement and asset mutations create audit log entries
+- **Firestore indexes**: Deploy indexes before using: `firebase deploy --only firestore:indexes`
+
+### 🧪 Testing Recommendations
+1. Dashboard:
+   - Click each quick action button and verify navigation
+2. Announcements:
+   - Create announcement with different target audiences (all, projects, roles)
+   - Pin/unpin announcements
+   - Filter by type and priority
+3. Assets:
+   - Switch between projects in the dropdown
+   - Toggle "Show Global" to include/exclude global assets
+   - Assign/unassign assets to users
+   - Create assets with different types and statuses
+
+### 📌 Follow-ups
+- Deploy Firestore indexes: `firebase deploy --only firestore:indexes`
+- Add navigation links in sidebar for Announcements and Assets
+- Consider real-time updates using Firestore onSnapshot
+- Add file attachments for announcements (optional feature)
+
+---
+
 ## 0.5.10 - 2026-02-01 | 🐛 fix: Tasks page dropdown and task loading
 
 ### 📄 Summary
