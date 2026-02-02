@@ -9,8 +9,11 @@ const db = admin.firestore();
 const SUPER_ADMINS = ['bill@samas.tech', 'bilgrami@gmail.com'];
 // Default users with specific roles
 const DEFAULT_USERS = {
-    'saminas.samas@gmail.com': ['finance_manager'],
+    'saminas.samas@gmail.com': ['finance_incharge'],
     'shahneela.samas@gmail.com': ['project_manager'],
+    'hinas.samas@gmail.com': ['analyst'],
+    'asmaaslam.samas@gmail.com': ['analyst'],
+    'shamsa.samas0@gmail.com': ['analyst'],
 };
 /**
  * Trigger: When a new user signs up via Firebase Auth
@@ -22,13 +25,13 @@ exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
     const predefinedRoles = DEFAULT_USERS[email];
     let roles;
     if (isSuperAdmin) {
-        roles = ['super_admin'];
+        roles = ['superuser'];
     }
     else if (predefinedRoles) {
         roles = predefinedRoles;
     }
     else {
-        roles = ['employee'];
+        roles = ['analyst'];
     }
     const userData = {
         email: user.email || '',
@@ -60,34 +63,34 @@ exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
 exports.seedRoles = functions.https.onRequest(async (req, res) => {
     const roles = [
         {
-            id: 'super_admin',
+            id: 'superuser',
             name: 'Super Admin',
             description: 'Full system access',
             isSystem: true,
             permissions: {
-                finance: { create: true, read: true, update: true, delete: true },
-                documents: { create: true, read: true, update: true, delete: true },
-                projects: { create: true, read: true, update: true, delete: true },
-                assets: { create: true, read: true, update: true, delete: true },
-                tasks: { create: true, read: true, update: true, delete: true },
-                announcements: { create: true, read: true, update: true, delete: true },
-                rbac: { create: true, read: true, update: true, delete: true },
+                finance: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                documents: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                projects: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                assets: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                tasks: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                announcements: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                rbac: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
             },
             dataAccess: { allProjects: true, sensitiveFinancials: true, globalAssets: true },
         },
         {
-            id: 'finance_manager',
-            name: 'Finance Manager',
+            id: 'finance_incharge',
+            name: 'Finance In-Charge',
             description: 'Manage finances and view sensitive data',
             isSystem: true,
             permissions: {
-                finance: { create: true, read: true, update: true, delete: true },
-                documents: { create: true, read: true, update: false, delete: false },
-                projects: { create: false, read: true, update: false, delete: false },
-                assets: { create: false, read: true, update: false, delete: false },
-                tasks: { create: false, read: true, update: false, delete: false },
-                announcements: { create: true, read: true, update: true, delete: false },
-                rbac: { create: false, read: false, update: false, delete: false },
+                finance: { actions: ['create', 'read', 'update', 'delete'], scope: 'global' },
+                documents: { actions: ['create', 'read'], scope: 'global' },
+                projects: { actions: ['read'], scope: 'global' },
+                assets: { actions: ['read'], scope: 'global' },
+                tasks: { actions: ['read'], scope: 'global' },
+                announcements: { actions: ['create', 'read', 'update'], scope: 'global' },
+                rbac: { actions: [], scope: 'none' },
             },
             dataAccess: { allProjects: true, sensitiveFinancials: true, globalAssets: true },
         },
@@ -97,45 +100,45 @@ exports.seedRoles = functions.https.onRequest(async (req, res) => {
             description: 'Manage assigned projects and teams',
             isSystem: true,
             permissions: {
-                finance: { create: true, read: true, update: false, delete: false },
-                documents: { create: true, read: true, update: true, delete: true },
-                projects: { create: true, read: true, update: true, delete: false },
-                assets: { create: true, read: true, update: true, delete: false },
-                tasks: { create: true, read: true, update: true, delete: true },
-                announcements: { create: true, read: true, update: true, delete: false },
-                rbac: { create: false, read: false, update: false, delete: false },
+                finance: { actions: ['create', 'read'], scope: 'project' },
+                documents: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                projects: { actions: ['create', 'read', 'update'], scope: 'project' },
+                assets: { actions: ['create', 'read', 'update'], scope: 'project' },
+                tasks: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                announcements: { actions: ['create', 'read', 'update'], scope: 'project' },
+                rbac: { actions: [], scope: 'none' },
             },
             dataAccess: { allProjects: false, sensitiveFinancials: false, globalAssets: false },
         },
         {
-            id: 'employee',
-            name: 'Employee',
+            id: 'qa_manager',
+            name: 'QA Manager',
+            description: 'Quality assurance lead',
+            isSystem: true,
+            permissions: {
+                finance: { actions: ['read'], scope: 'project' },
+                documents: { actions: ['create', 'read', 'update'], scope: 'project' },
+                projects: { actions: ['read'], scope: 'project' },
+                assets: { actions: ['read', 'update'], scope: 'project' },
+                tasks: { actions: ['create', 'read', 'update'], scope: 'project' },
+                announcements: { actions: ['create', 'read'], scope: 'project' },
+                rbac: { actions: [], scope: 'none' },
+            },
+            dataAccess: { allProjects: false, sensitiveFinancials: false, globalAssets: false },
+        },
+        {
+            id: 'analyst',
+            name: 'Analyst',
             description: 'Standard employee access',
             isSystem: true,
             permissions: {
-                finance: { create: true, read: true, update: true, delete: false },
-                documents: { create: true, read: true, update: false, delete: false },
-                projects: { create: false, read: true, update: false, delete: false },
-                assets: { create: false, read: true, update: false, delete: false },
-                tasks: { create: false, read: true, update: true, delete: false },
-                announcements: { create: false, read: true, update: false, delete: false },
-                rbac: { create: false, read: false, update: false, delete: false },
-            },
-            dataAccess: { allProjects: false, sensitiveFinancials: false, globalAssets: false },
-        },
-        {
-            id: 'external',
-            name: 'External Viewer',
-            description: 'Read-only access to shared projects',
-            isSystem: true,
-            permissions: {
-                finance: { create: false, read: false, update: false, delete: false },
-                documents: { create: false, read: true, update: false, delete: false },
-                projects: { create: false, read: true, update: false, delete: false },
-                assets: { create: false, read: false, update: false, delete: false },
-                tasks: { create: false, read: true, update: false, delete: false },
-                announcements: { create: false, read: true, update: false, delete: false },
-                rbac: { create: false, read: false, update: false, delete: false },
+                finance: { actions: ['create', 'read', 'update'], scope: 'own' },
+                documents: { actions: ['create', 'read'], scope: 'project' },
+                projects: { actions: ['read'], scope: 'project' },
+                assets: { actions: ['read'], scope: 'project' },
+                tasks: { actions: ['read', 'update'], scope: 'own' },
+                announcements: { actions: ['read'], scope: 'global' },
+                rbac: { actions: [], scope: 'none' },
             },
             dataAccess: { allProjects: false, sensitiveFinancials: false, globalAssets: false },
         },

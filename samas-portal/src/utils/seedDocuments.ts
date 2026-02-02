@@ -21,6 +21,7 @@ const createFolder = (
   projectId: null,
   createdBy: userId,
   sharedWith: [],
+  visibility: 'global',
   createdAt: Timestamp.now(),
   updatedAt: Timestamp.now(),
 });

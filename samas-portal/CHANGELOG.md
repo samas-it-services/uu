@@ -11,6 +11,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.7 - 2026-02-01 | 🐛 fix: Role ID mismatch and missing visibility property
+
+### 📄 Summary
+Fixed production deployment issues: (1) Role ID mismatch between Cloud Functions and frontend/Firestore rules, (2) Missing `visibility` property in seedDocuments utility causing TypeScript build failures.
+
+### 📁 Files Changed
+**Modified Files:**
+- `functions/src/index.ts` - Updated role IDs to match frontend conventions (`superuser`, `finance_incharge`, `qa_manager`, `analyst` instead of `super_admin`, `finance_manager`, `employee`). Updated permissions structure to use `actions[]` array with `scope` field.
+- `src/utils/seedDocuments.ts` - Added missing `visibility: 'global'` property to `createFolder` function.
+
+### 🧠 Rationale
+1. **Role ID mismatch**: Cloud Functions created roles with IDs like `super_admin` and `finance_manager`, but the frontend code, usePermissions hook, and Firestore security rules expected `superuser` and `finance_incharge`. This caused permission lookups to fail.
+2. **Missing visibility**: The Folder type requires a `visibility` property, but `createFolder` didn't include it, causing TypeScript compilation to fail.
+
+### 🔄 Behavior / Compatibility Implications
+- **Requires re-seeding roles**: Call `https://us-central1-uu-portal-60426.cloudfunctions.net/seedRoles` to update roles in Firestore
+- **No breaking changes**: Role structure now consistent across all layers
+- **Default users updated**: Added predefined roles for additional team members
+
+### 🧪 Testing Recommendations
+1. Run `npm run build` - should complete without errors
+2. Run `npm run lint` - should pass with 0 warnings
+3. Run `npm test` - all 102 tests should pass
+4. Visit https://uu-portal-60426.web.app and verify login works
+5. Verify role permissions work correctly after seeding
+
+### 📌 Follow-ups
+- Update Node.js runtime from 20 to latest LTS (deprecation warning)
+- Upgrade firebase-functions SDK to >=5.1.0
+
+---
+
 ## 0.5.6 - 2026-01-27 | 🐛 fix: Select component and Firestore superuser check
 
 ### 📄 Summary
