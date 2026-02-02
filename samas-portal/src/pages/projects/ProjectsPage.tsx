@@ -48,7 +48,9 @@ export const ProjectsPage: FC = () => {
     () => ({
       status: statusFilter !== 'all' ? statusFilter : undefined,
       priority: priorityFilter !== 'all' ? priorityFilter : undefined,
-      isArchived: showArchived,
+      // Only filter by isArchived when showing archived items
+      // This ensures documents without isArchived field are still returned
+      isArchived: showArchived ? true : undefined,
     }),
     [statusFilter, priorityFilter, showArchived]
   );

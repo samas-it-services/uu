@@ -19,6 +19,8 @@ export interface Document {
   previousVersions: DocumentVersion[];
   googleDriveId: string | null;
   isSensitive: boolean;
+  visibility: 'global' | 'project' | 'private' | 'role';
+  allowedRoles?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -56,6 +58,8 @@ export interface Folder {
   projectId: string | null;
   createdBy: string;
   sharedWith: DocumentShare[];
+  visibility: 'global' | 'project' | 'private' | 'role';
+  allowedRoles?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

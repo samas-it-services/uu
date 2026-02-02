@@ -32,12 +32,10 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Exclude Firestore streaming from service worker - can't cache real-time connections
+        navigateFallbackDenylist: [/firestore\.googleapis\.com/],
         runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/firestore\.googleapis\.com/,
-            handler: 'NetworkFirst',
-            options: { cacheName: 'firestore-cache', expiration: { maxEntries: 100, maxAgeSeconds: 3600 } }
-          },
+          // Storage assets can be cached
           {
             urlPattern: /^https:\/\/storage\.googleapis\.com/,
             handler: 'CacheFirst',

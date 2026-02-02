@@ -34,6 +34,7 @@ export interface CreateDocumentData {
   uploadedByName: string;
   tags?: string[];
   isSensitive?: boolean;
+  visibility?: 'global' | 'project' | 'private' | 'role';
 }
 
 export interface UpdateDocumentData {
@@ -42,6 +43,7 @@ export interface UpdateDocumentData {
   folderId?: string | null;
   tags?: string[];
   isSensitive?: boolean;
+  visibility?: 'global' | 'project' | 'private' | 'role';
 }
 
 export interface CreateFolderData {
@@ -49,6 +51,7 @@ export interface CreateFolderData {
   parentId?: string | null;
   projectId?: string | null;
   createdBy: string;
+  visibility?: 'global' | 'project' | 'private' | 'role';
 }
 
 export interface DocumentFilters {
@@ -150,6 +153,12 @@ export const documentsApi = {
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
 
+    // Determine visibility
+    let visibility = data.visibility;
+    if (!visibility) {
+      visibility = data.projectId ? 'project' : 'global';
+    }
+
     const docsRef = collection(db, DOCUMENTS_COLLECTION);
     const docRef = await addDoc(docsRef, {
       name: data.name || file.name,
@@ -169,6 +178,7 @@ export const documentsApi = {
       previousVersions: [],
       googleDriveId: null,
       isSensitive: data.isSensitive || false,
+      visibility,
       createdAt: now,
       updatedAt: now,
     });
@@ -310,12 +320,20 @@ export const documentsApi = {
   async createFolder(data: CreateFolderData): Promise<string> {
     const now = Timestamp.now();
     const foldersRef = collection(db, FOLDERS_COLLECTION);
+    
+    // Determine visibility
+    let visibility = data.visibility;
+    if (!visibility) {
+      visibility = data.projectId ? 'project' : 'global';
+    }
+
     const docRef = await addDoc(foldersRef, {
       name: data.name,
       parentId: data.parentId || null,
       projectId: data.projectId || null,
       createdBy: data.createdBy,
       sharedWith: [],
+      visibility,
       createdAt: now,
       updatedAt: now,
     });
