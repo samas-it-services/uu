@@ -179,7 +179,11 @@ export const AssetsPage: FC = () => {
   };
 
   const handleProjectChange = (projectId: string) => {
-    searchParams.set('project', projectId);
+    if (projectId && projectId !== 'all') {
+      searchParams.set('project', projectId);
+    } else {
+      searchParams.delete('project');
+    }
     setSearchParams(searchParams);
   };
 
@@ -285,7 +289,7 @@ export const AssetsPage: FC = () => {
         <div className="flex items-center gap-4">
           {/* Project Switcher */}
           <div data-testid="project-switcher" className="flex items-center gap-2">
-            <Select value={selectedProjectId} onValueChange={handleProjectChange}>
+            <Select value={selectedProjectId || 'all'} onValueChange={handleProjectChange}>
               <SelectTrigger className="w-[200px]">
                 <div className="flex items-center gap-2">
                   <Folder className="h-4 w-4" data-testid="project-icon" />
@@ -295,6 +299,7 @@ export const AssetsPage: FC = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">Select a project...</SelectItem>
                 {accessibleProjects.map((project) => (
                   <SelectItem
                     key={project.id}
