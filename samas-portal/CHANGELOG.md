@@ -11,6 +11,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.8 - 2026-02-01 | 🚀 feat: Add seedProjectTeam function for project team seeding
+
+### 📄 Summary
+Added a new Cloud Function `seedProjectTeam` to seed team members with project-level roles. Seeded ilm.red project with 4 team members (Bill, Hina, Shahneela, Samina) and created custom project roles (Project Admin, QA Lead, Finance Lead).
+
+### 📁 Files Changed
+**Modified Files:**
+- `functions/src/index.ts` - Added `seedProjectTeam` HTTP function that creates project roles and assigns team members
+- `.claude/claude.md` - Added Firebase CLI command instructions for Node.js 24 compatibility
+
+### 🧠 Rationale
+The ilm.red project needed team members assigned with appropriate project-level roles. A reusable Cloud Function was created to:
+1. Create custom project roles (Project Admin, QA Lead, Finance Lead) in the project's roles subcollection
+2. Look up users by email and add them to the project's teamMembers array
+3. Update each user's projects array to include the project ID
+
+### 🔄 Behavior / Compatibility Implications
+- **New function deployed**: `seedProjectTeam` available at `https://us-central1-uu-portal-60426.cloudfunctions.net/seedProjectTeam?projectId=<id>`
+- **No breaking changes**: Existing project data is updated, not replaced
+- **Firebase CLI note**: Use `/opt/homebrew/opt/node@24/bin/node "$(command -v firebase)"` for all Firebase commands
+
+### 🧪 Testing Recommendations
+1. Visit https://uu.samas.tech/projects/project_1769388193328_22bldg2d4
+2. Click "Team" tab - verify 4 members appear with correct roles
+3. Check project Settings tab - verify Project Admin, QA Lead, Finance Lead roles exist
+
+### 📌 Follow-ups
+- Consider adding authentication/authorization to the seedProjectTeam endpoint
+- Add ability to pass team configuration as request body for flexibility
+
+---
+
 ## 0.5.7 - 2026-02-01 | 🐛 fix: Role ID mismatch and missing visibility property
 
 ### 📄 Summary

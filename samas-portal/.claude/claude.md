@@ -77,7 +77,21 @@ npm run build        # Build for production
 npm test             # Run tests
 npm run lint         # Lint code
 npm run typecheck    # Check types
-firebase emulators:start  # Start Firebase emulators
+```
+
+## Firebase Commands
+
+Use the following pattern for all Firebase CLI commands (required for Node.js compatibility):
+
+```bash
+/opt/homebrew/opt/node@24/bin/node "$(command -v firebase)" <command>
+```
+
+Examples:
+```bash
+/opt/homebrew/opt/node@24/bin/node "$(command -v firebase)" emulators:start
+/opt/homebrew/opt/node@24/bin/node "$(command -v firebase)" deploy --only functions
+/opt/homebrew/opt/node@24/bin/node "$(command -v firebase)" functions:log
 ```
 
 ## Git Commits

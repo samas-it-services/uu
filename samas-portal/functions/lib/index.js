@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fixImportedProjects = exports.onUserUpdated = exports.seedRoles = exports.onUserCreated = void 0;
+exports.seedProjectTeam = exports.fixImportedProjects = exports.onUserUpdated = exports.seedRoles = exports.onUserCreated = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
@@ -254,6 +254,128 @@ exports.fixImportedProjects = functions.https.onRequest(async (req, res) => {
         message: `Fixed ${fixedCount} projects with missing fields`,
         fixed: fixedCount,
         projects: fixedProjects,
+    });
+});
+/**
+ * HTTP Function: Seed project team members with roles
+ * Creates custom project roles and adds team members
+ *
+ * Usage: curl "https://us-central1-uu-portal-60426.cloudfunctions.net/seedProjectTeam?projectId=project_1769388193328_22bldg2d4"
+ */
+exports.seedProjectTeam = functions.https.onRequest(async (req, res) => {
+    const projectId = req.query.projectId;
+    if (!projectId) {
+        res.status(400).json({ error: 'Missing projectId query parameter' });
+        return;
+    }
+    // Team configuration for ilm.red
+    const teamConfig = [
+        { email: 'bill@samas.tech', projectRole: 'Project Admin' },
+        { email: 'hinas.samas@gmail.com', projectRole: 'QA Lead' },
+        { email: 'shahneela.samas@gmail.com', projectRole: 'Project Admin' },
+        { email: 'saminas.samas@gmail.com', projectRole: 'Finance Lead' },
+    ];
+    // Project roles to create (including default Project Admin)
+    const customRoles = [
+        {
+            id: 'project_admin',
+            name: 'Project Admin',
+            description: 'Full administrative access to the project',
+            isDefault: true,
+            color: '#3b82f6', // blue
+            permissions: {
+                finance: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                documents: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                projects: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                assets: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                tasks: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                announcements: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                rbac: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+            },
+        },
+        {
+            id: 'qa_lead',
+            name: 'QA Lead',
+            description: 'Quality assurance lead for the project',
+            isDefault: false,
+            color: '#8b5cf6', // purple
+            permissions: {
+                finance: { actions: ['read'], scope: 'project' },
+                documents: { actions: ['create', 'read', 'update'], scope: 'project' },
+                projects: { actions: ['read'], scope: 'project' },
+                assets: { actions: ['read', 'update'], scope: 'project' },
+                tasks: { actions: ['create', 'read', 'update'], scope: 'project' },
+                announcements: { actions: ['create', 'read'], scope: 'project' },
+                rbac: { actions: [], scope: 'none' },
+            },
+        },
+        {
+            id: 'finance_lead',
+            name: 'Finance Lead',
+            description: 'Finance lead for the project',
+            isDefault: false,
+            color: '#f59e0b', // amber
+            permissions: {
+                finance: { actions: ['create', 'read', 'update', 'delete'], scope: 'project' },
+                documents: { actions: ['create', 'read'], scope: 'project' },
+                projects: { actions: ['read'], scope: 'project' },
+                assets: { actions: ['read'], scope: 'project' },
+                tasks: { actions: ['read'], scope: 'project' },
+                announcements: { actions: ['create', 'read', 'update'], scope: 'project' },
+                rbac: { actions: [], scope: 'none' },
+            },
+        },
+    ];
+    // 1. Create custom project roles
+    const rolesRef = db.collection('projects').doc(projectId).collection('roles');
+    for (const role of customRoles) {
+        await rolesRef.doc(role.id).set(Object.assign(Object.assign({}, role), { projectId, createdAt: admin.firestore.FieldValue.serverTimestamp(), updatedAt: admin.firestore.FieldValue.serverTimestamp() }));
+    }
+    // 2. Get all project roles (including existing defaults)
+    const rolesSnap = await rolesRef.get();
+    const projectRoles = rolesSnap.docs.map(d => (Object.assign({ id: d.id }, d.data())));
+    // 3. Get user documents by email
+    const usersSnap = await db.collection('users').get();
+    const usersByEmail = new Map(usersSnap.docs.map(d => {
+        const data = d.data();
+        return [data.email, Object.assign({ id: d.id }, data)];
+    }));
+    // 4. Build team members array
+    const now = new Date();
+    const teamMembers = [];
+    for (const member of teamConfig) {
+        const user = usersByEmail.get(member.email);
+        if (!user) {
+            functions.logger.warn(`User not found: ${member.email}`);
+            continue;
+        }
+        const projectRole = projectRoles.find(r => r.name === member.projectRole);
+        teamMembers.push({
+            userId: user.id,
+            userName: user.displayName || user.email || '',
+            userPhotoURL: user.photoURL || '',
+            role: 'member', // deprecated field
+            projectRoleId: (projectRole === null || projectRole === void 0 ? void 0 : projectRole.id) || '',
+            projectRoleName: (projectRole === null || projectRole === void 0 ? void 0 : projectRole.name) || '',
+            joinedAt: now,
+        });
+    }
+    // 5. Update project with team members
+    await db.collection('projects').doc(projectId).update({
+        teamMembers,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    // 6. Update users' projects array
+    for (const member of teamMembers) {
+        await db.collection('users').doc(member.userId).update({
+            projects: admin.firestore.FieldValue.arrayUnion(projectId),
+        });
+    }
+    res.json({
+        success: true,
+        message: `Added ${teamMembers.length} team members to project`,
+        teamMembers: teamMembers.map(m => ({ userId: m.userId, userName: m.userName, role: m.projectRoleName })),
+        customRolesCreated: customRoles.map(r => r.name),
     });
 });
 //# sourceMappingURL=index.js.map
