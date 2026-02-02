@@ -50,6 +50,7 @@ const createDocument = (
   previousVersions: [],
   googleDriveId: type !== 'file' ? `gdrive_${id}` : null,
   isSensitive: false,
+  visibility: 'global', // Default visibility for seeded documents
   createdAt: Timestamp.now(),
   updatedAt: Timestamp.now(),
 });
@@ -61,9 +62,10 @@ export const seedDefaultDocuments = async (userId: string): Promise<void> => {
   }
 
   console.log('Starting document seed...');
-
-  const batch = [];
   
+  const foldersCollectionRef = collection(db, 'folders');
+  const documentsCollectionRef = collection(db, 'documents');
+
   // Create Folders
   const folders: Folder[] = [
     createFolder('folder_finance', 'Finance', null, userId),
@@ -73,7 +75,7 @@ export const seedDefaultDocuments = async (userId: string): Promise<void> => {
   ];
 
   for (const folder of folders) {
-    await setDoc(doc(db, 'folders', folder.id), folder);
+    await setDoc(doc(foldersCollectionRef, folder.id), folder);
     console.log(`Created folder: ${folder.name}`);
   }
 
@@ -87,7 +89,7 @@ export const seedDefaultDocuments = async (userId: string): Promise<void> => {
   ];
 
   for (const d of documents) {
-    await setDoc(doc(db, 'documents', d.id), d);
+    await setDoc(doc(documentsCollectionRef, d.id), d);
     console.log(`Created document: ${d.name}`);
   }
 
