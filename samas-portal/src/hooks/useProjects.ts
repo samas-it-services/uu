@@ -46,6 +46,13 @@ export const useActiveProjects = () => {
   });
 };
 
+export const useAllProjects = () => {
+  return useQuery({
+    queryKey: [PROJECTS_QUERY_KEY, 'all-non-archived'],
+    queryFn: () => projectsApi.getAllNonArchived(),
+  });
+};
+
 export const useProjectStats = (projectId: string) => {
   return useQuery({
     queryKey: [PROJECTS_QUERY_KEY, 'stats', projectId],

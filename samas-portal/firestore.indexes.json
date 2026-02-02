@@ -18,6 +18,14 @@
       ]
     },
     {
+      "collectionGroup": "tasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "projectId", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "expenses",
       "queryScope": "COLLECTION",
       "fields": [

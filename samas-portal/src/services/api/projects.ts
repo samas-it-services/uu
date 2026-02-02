@@ -183,6 +183,20 @@ export const projectsApi = {
     })) as Project[];
   },
 
+  async getAllNonArchived(): Promise<Project[]> {
+    const projectsRef = collection(db, PROJECTS_COLLECTION);
+    const q = query(
+      projectsRef,
+      where('isArchived', '==', false),
+      orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Project[];
+  },
+
   async create(data: CreateProjectData): Promise<string> {
     const projectsRef = collection(db, PROJECTS_COLLECTION);
     const now = Timestamp.now();

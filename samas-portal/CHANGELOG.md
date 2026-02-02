@@ -11,6 +11,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.10 - 2026-02-01 | 🐛 fix: Tasks page dropdown and task loading
+
+### 📄 Summary
+Fixed two issues with the Tasks (Kanban) page:
+1. Project dropdown now shows all non-archived projects (not just 'planning' or 'active' status)
+2. Added missing Firestore composite index for `projectId` + `order` to enable task queries
+
+### 📁 Files Changed
+**Modified Files:**
+- `src/services/api/projects.ts` - Added `getAllNonArchived()` method
+- `src/hooks/useProjects.ts` - Added `useAllProjects()` hook
+- `src/pages/tasks/KanbanPage.tsx` - Changed to use `useAllProjects()` instead of `useActiveProjects()`
+- `firestore.indexes.json` - Added composite index for tasks (`projectId` + `order`)
+
+### 🧠 Rationale
+1. **Dropdown issue**: `useActiveProjects()` only fetched projects with status 'planning' or 'active'. Projects with other statuses (e.g., 'completed', 'on_hold') were excluded from the dropdown.
+2. **Tasks not loading**: The `getByProject()` query used `where('projectId', '==', projectId)` with `orderBy('order', 'asc')`, which requires a Firestore composite index. Without the index, the query failed silently.
+
+### 🔄 Behavior / Compatibility Implications
+- **Dropdown change**: All non-archived projects now appear in the project selector, regardless of status
+- **Index deployed**: Firestore index for tasks (`projectId` + `order`) has been deployed
+
+### 🧪 Testing Recommendations
+1. Visit https://uu.samas.tech/tasks
+2. Verify ilm.red appears in project dropdown
+3. Select ilm.red project
+4. Verify tasks from Firestore appear on the Kanban board
+5. Visit https://uu.samas.tech/tasks?project=project_1769388193328_22bldg2d4 directly
+6. Verify tasks load correctly
+
+### 📌 Follow-ups
+- None required
+
+---
+
 ## 0.5.9 - 2026-02-01 | 🐛 fix: Documents page now respects project query parameter
 
 ### 📄 Summary

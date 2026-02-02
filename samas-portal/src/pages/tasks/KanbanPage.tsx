@@ -25,7 +25,7 @@ import { TaskModal } from '@/components/modules/tasks/TaskModal';
 import { TaskComments } from '@/components/modules/tasks/TaskComments';
 import { TaskAttachments } from '@/components/modules/tasks/TaskAttachments';
 import { useProjectTasks, useTaskStats, useDeleteTask } from '@/hooks/useTasks';
-import { useActiveProjects } from '@/hooks/useProjects';
+import { useAllProjects } from '@/hooks/useProjects';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Avatar } from '@/components/ui/Avatar';
 import { format } from 'date-fns';
@@ -57,7 +57,7 @@ export const KanbanPage: FC = () => {
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [defaultStatus, setDefaultStatus] = useState<TaskStatus>('backlog');
 
-  const { data: projects, isLoading: projectsLoading } = useActiveProjects();
+  const { data: projects, isLoading: projectsLoading } = useAllProjects();
   const { data: tasks, isLoading: tasksLoading } = useProjectTasks(projectId);
   const { data: stats } = useTaskStats(projectId);
   const deleteTask = useDeleteTask();
