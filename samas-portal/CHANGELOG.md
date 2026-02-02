@@ -11,6 +11,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.9 - 2026-02-01 | 🐛 fix: Documents page now respects project query parameter
+
+### 📄 Summary
+Fixed the Documents page to properly filter documents when a `project` query parameter is provided in the URL. Previously, visiting `/documents?project=<projectId>` would ignore the filter and show "folder is empty".
+
+### 📁 Files Changed
+**Modified Files:**
+- `src/pages/documents/DocumentsPage.tsx` - Added project filter support via URL query parameter
+
+### 🧠 Rationale
+The Documents page had no logic to read the `project` URL query parameter. It only used `useFolderDocuments(currentFolderId)` which fetches documents by folder, completely ignoring any project filter. The fix:
+1. Reads the `project` query parameter using `useSearchParams` from react-router-dom
+2. When a project filter exists, uses `useProjectDocuments(projectId)` instead of `useFolderDocuments`
+3. Passes `projectId` to `useFolders()` and `useDocumentStats()` hooks (they already support it)
+4. Updates breadcrumb to show "Project Documents" when filtering by project
+
+### 🔄 Behavior / Compatibility Implications
+- **No breaking changes**: Default behavior (no project filter) works exactly as before
+- **New behavior**: When `?project=<id>` is in the URL, only documents for that project are shown
+- **Breadcrumb change**: Shows "Project Documents" instead of "Documents" when project filter is active
+
+### 🧪 Testing Recommendations
+1. Visit https://uu.samas.tech/documents?project=project_1769388193328_22bldg2d4
+2. Verify documents for ilm.red project appear
+3. Visit https://uu.samas.tech/documents (no project filter)
+4. Verify all root-level documents appear as before
+5. Test folder navigation still works in both modes
+
+### 📌 Follow-ups
+- Consider adding a visual indicator or project name in the header when filtering by project
+- Consider adding a "Clear filter" button when project filter is active
+
+---
+
 ## 0.5.8 - 2026-02-01 | 🚀 feat: Add seedProjectTeam function for project team seeding
 
 ### 📄 Summary

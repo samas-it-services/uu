@@ -1,4 +1,5 @@
-import { FC, useState, useMemo } from 'react';
+import { FC, useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Search,
   FolderPlus,
@@ -20,6 +21,7 @@ import { DocumentViewer } from '@/components/documents/DocumentViewer';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import {
   useFolderDocuments,
+  useProjectDocuments,
   useFolders,
   useDeleteDocument,
   useCreateFolder,
@@ -33,9 +35,12 @@ import { Document } from '@/types/document';
 export const DocumentsPage: FC = () => {
   const { user } = useAuth();
   const { hasPermission, canAccessSensitiveData } = usePermissions();
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get('project') || '';
+
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [folderPath, setFolderPath] = useState<{ id: string | null; name: string }[]>([
-    { id: null, name: 'Documents' },
+    { id: null, name: projectId ? 'Project Documents' : 'Documents' },
   ]);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
@@ -45,13 +50,25 @@ export const DocumentsPage: FC = () => {
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [showViewer, setShowViewer] = useState(false);
 
+  // Update breadcrumb root name when projectId changes
+  useEffect(() => {
+    setFolderPath([{ id: null, name: projectId ? 'Project Documents' : 'Documents' }]);
+    setCurrentFolderId(null);
+  }, [projectId]);
+
   const canCreate = hasPermission('documents', 'create');
   const canDelete = hasPermission('documents', 'delete');
   const canSeeSensitive = canAccessSensitiveData;
 
-  const { data: documents, isLoading: docsLoading } = useFolderDocuments(currentFolderId);
-  const { data: folders, isLoading: foldersLoading } = useFolders(currentFolderId);
-  const { data: stats } = useDocumentStats();
+  // When project filter is active, get project documents; otherwise get folder documents
+  const { data: projectDocs, isLoading: projectDocsLoading } = useProjectDocuments(projectId);
+  const { data: folderDocs, isLoading: folderDocsLoading } = useFolderDocuments(currentFolderId);
+
+  const documents = projectId ? projectDocs : folderDocs;
+  const docsLoading = projectId ? projectDocsLoading : folderDocsLoading;
+
+  const { data: folders, isLoading: foldersLoading } = useFolders(currentFolderId, projectId || undefined);
+  const { data: stats } = useDocumentStats(projectId || undefined);
   const deleteDocument = useDeleteDocument();
   const createFolder = useCreateFolder();
   const deleteFolder = useDeleteFolder();
@@ -91,7 +108,7 @@ export const DocumentsPage: FC = () => {
   const navigateToFolder = (folderId: string | null, folderName: string) => {
     setCurrentFolderId(folderId);
     if (folderId === null) {
-      setFolderPath([{ id: null, name: 'Documents' }]);
+      setFolderPath([{ id: null, name: projectId ? 'Project Documents' : 'Documents' }]);
     } else {
       setFolderPath((prev) => [...prev, { id: folderId, name: folderName }]);
     }
